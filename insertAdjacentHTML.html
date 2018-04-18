@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>blog</title>
+</head>
+
+<body>
+    <div class="root">
+        <div class="side-part">
+            <div class="button" onclick='clearTargetDom()'>
+                清理元素
+            </div>
+            <div class="button" onclick='insertFn("beforeBegin")'>
+                beforeBegin
+            </div>
+            <div class="button" onclick='insertFn("afterBegin")'>
+                afterBegin
+            </div>
+            <div class="button" onclick='insertFn("beforeEnd")'>
+                beforeEnd
+            </div>
+            <div class="button" onclick='insertFn("afterEnd")'>
+                afterEnd
+            </div>
+        </div>
+        <div class="main-part">
+            <ul class="dom-container">
+                <li class="dom"></li>
+                <li class="dom"></li>
+                <li class="dom"></li>
+                <li class="dom"></li>
+                <li class="dom" id='target-dom'>目标元素</li>
+                <li class="dom"></li>
+                <li class="dom"></li>
+                <li class="dom"></li>
+                <li class="dom"></li>
+                <li class="dom"></li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+<style>
+    html,
+    body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .root {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between
+    }
+
+    .root .button {
+        border: 1px solid #80D9B4;
+        border-radius: 3px;
+        color: #80D9B4;
+        text-align: center;
+        padding: 3px 10px;
+        margin: 5px 10px;
+        cursor: pointer;
+    }
+
+    .root .button:hover {
+        background: #80D9B4;
+        color: #fff;
+    }
+
+    .root .side-part {}
+
+    .root .main-part {
+        width: 80%;
+        height: 100%;
+    }
+
+    .root .main-part .dom-container {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #EB5959;
+        border-radius: 3px;
+        list-style: none;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .root .main-part .dom-container .dom {
+        border: 1px solid #EB5959;
+        border-radius: 3px;
+        text-align: center;
+        width: 100px;
+        height: 100px;
+    }
+
+    .root .main-part .dom-container #target-dom {
+        width: 200px;
+        height: 200px;
+        display: flex;
+        border-color: #80D9B4;
+    }
+</style>
+<script>
+    var $target = document.getElementById('target-dom');
+
+    var insertPartHTML = '<li class="dom insert-dom">插入节点</li>'
+
+    function clearTargetDom() {
+        document.querySelectorAll('.insert-dom').forEach((item) => {
+            item.remove();
+        })
+    }
+
+    function insertFn(position) {
+        $target.insertAdjacentHTML(position, insertPartHTML);
+    }
+
+</script>
+
+</html>
