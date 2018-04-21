@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>scrollIntoView</title>
+</head>
+
+<body>
+    <div class="root">
+        <div class="side-part">
+            <div class="button" id='config-button'>更新config</div>
+            <textarea name="" id="config-value" cols="30" rows="10" value=''></textarea>
+        </div>
+        <div class="main-part">
+            <ul class="dom-container">
+                <li class="dom">dom-1</li>
+                <li class="dom">dom-2</li>
+                <li class="dom">dom-3</li>
+                <li class="dom">dom-4</li>
+                <li class="dom">dom-5</li>
+                <li class="dom">dom-6</li>
+                <li class="dom">dom-7</li>
+                <li class="dom">dom-8</li>
+                <li class="dom">dom-9</li>
+                <li class="dom">dom-10</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+<style>
+    html,
+    body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .root {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between
+    }
+
+    .root .button {
+        border: 1px solid #80D9B4;
+        border-radius: 3px;
+        color: #80D9B4;
+        text-align: center;
+        padding: 3px 10px;
+        margin: 5px 10px;
+        cursor: pointer;
+    }
+
+    .root .button:focus {
+
+        border: 1px solid #80D9B4;
+        border-radius: 3px;
+        background: #80D9B4;
+        color: #fff;
+    }
+
+    .root .active {
+        background: #80D9B4;
+        color: #fff;
+    }
+
+    .root .button:hover {
+        background: #80D9B4;
+        color: #fff;
+    }
+
+    .root .main-part {
+        width: 80%;
+    }
+
+    .root .main-part .dom-container {
+        display: flex;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #EB5959;
+        border-radius: 3px;
+        list-style: none;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .root .main-part .dom-container .dom {
+        border: 1px solid #EB5959;
+        border-radius: 3px;
+        text-align: center;
+        width: 100%;
+        height: 200px;
+        margin: 10px;
+    }
+</style>
+<script>
+    var config = {};
+
+    var $configInput = document.getElementById('config-value');
+    var $configButton = document.getElementById('config-button')
+
+    $configButton.addEventListener('click', function (e) {
+        config = JSON.parse(JSON.stringify($configInput.value));
+    })
+
+    $domContainer = document.getElementsByClassName('dom-container')[0];
+
+    $domContainer.addEventListener('click', function (e) {
+        target = e.target;
+
+        if (target && target.nodeType === 1) {
+            target.scrollIntoView(config);
+        }
+        console.log(config);
+    })
+</script>
+
+</html>

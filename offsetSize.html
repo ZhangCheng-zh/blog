@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Offset Size</title>
+</head>
+
+<body>
+    <div class="offset-parent">
+        <div class="offset-child" draggable="true">child</div>
+    </div>
+    <label>offsetTop:
+        <input type="text" value='' readonly>
+    </label>
+    <label>offsetLeft:
+        <input type="text" value='' readonly>
+    </label>
+    <style>
+        .offset-parent {
+            position: relative;
+            display: inline-block;
+            height: 300px;
+            width: 300px;
+            border: 1px solid #EB5959;
+        }
+
+        .offset-parent .offset-child {
+            position: absolute;
+            display: inline-block;
+            box-sizing: border-box;
+            height: 100px;
+            width: 100px;
+            border: 1px solid #EB5959;
+        }
+    </style>
+</body>
+<script>
+    var $child = document.getElementsByClassName('offset-child')[0];
+
+
+</script>
+
+</html>

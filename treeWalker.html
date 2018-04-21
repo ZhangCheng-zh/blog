@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>nodeIterator</title>
+</head>
+
+<body>
+    <div class="button-container">
+        <button class="button" data-index='1'>Previous Node</button>
+        <button class="button" data-index='2'>Next Node</button>
+        <button class="button" data-index='3'>Parent Node</button>
+        <button class="button" data-index='4'>First Child</button>
+        <button class="button" data-index='5'>Last Child</button>
+        <button class="button" data-index='6'>Next Sibling</button>
+        <button class="button" data-index='7'>Previous Sibling</button>
+    </div>
+    <div class="root">
+        <div class="first-floor">
+            <div class="second-floor"></div>
+            <div class="second-floor"></div>
+            <div class="second-floor"></div>
+        </div>
+        <div class="first-floor">
+            <div class="second-floor"></div>
+            <div class="second-floor"></div>
+            <div class="second-floor"></div>
+        </div>
+        <div class="first-floor">
+            <div class="second-floor"></div>
+            <div class="second-floor"></div>
+            <div class="second-floor"></div>
+        </div>
+        <div class="first-floor">
+            <div class="second-floor"></div>
+            <div class="second-floor"></div>
+            <div class="second-floor"></div>
+        </div>
+    </div>
+</body>
+<style>
+    div {
+        display: flex;
+        border: 1px solid red;
+        margin: 10px;
+        padding: 0;
+        flex-wrap: wrap;
+    }
+
+    .second-floor {
+        width: 200px;
+        height: 200px;
+    }
+</style>
+<script>
+    var $root = document.querySelector('.root');
+
+    var filter = function (node) {
+        return NodeFilter.FILTER_ACCEPT;
+    }
+
+    var walker = document.createTreeWalker($root, NodeFilter.SHOW_ELEMENT, filter, false);
+
+    var $button = document.querySelector('.button-container');
+
+    var $active = null;
+
+    $button.addEventListener('click', (e) => {
+        var target = e.target;
+
+        // 保存前一个节点
+        $previous = $active;
+
+        var index = target.dataset.index;
+
+        switch (index) {
+            case '1':
+                $active = walker.previousNode();
+                break;
+            case '2':
+                $active = walker.nextNode();
+                break;
+            case '3':
+                $active = walker.parentNode();
+                break;
+            case '4':
+                $active = walker.firstChild();
+                break;
+            case '5':
+                $active = walker.lastChild();
+                break;
+            case '6':
+                $active = walker.nextSibling();
+                break;
+            case '7':
+                $active = walker.previousSibling();
+                break;
+            default:
+                break;
+        }
+
+        if (target.dataset.index) {
+            if ($active) {
+                $active.style.backgroundColor = 'red';
+                if ($previous) { $previous.style.backgroundColor = ''; }
+            } else {
+                $active = $previous;
+            }
+        }
+    })
+
+</script>
+
+</html>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>blog</title>
+    <title>insertAdjacentHTML</title>
 </head>
 
 <body>
@@ -14,16 +14,18 @@
             <div class="button" onclick='clearTargetDom()'>
                 清理元素
             </div>
-            <div class="button" onclick='insertFn("beforeBegin")'>
+            <div class="button" onclick='insertFn("beforeBegin")' title="在当前元素之前插入一个紧邻的同辈元素">
                 beforeBegin
             </div>
-            <div class="button" onclick='insertFn("afterBegin")'>
+            <div class="button" onclick='insertFn("afterBegin")' title="在当前元素之下插入一个新的子元素
+            或在最后一个子元素之后再插入新的子元素">
                 afterBegin
             </div>
-            <div class="button" onclick='insertFn("beforeEnd")'>
+            <div class="button" onclick='insertFn("beforeEnd")' title="在当前元素之下插入一个新的子元素
+            或在最后一个子元素之后再插入新的子元素">
                 beforeEnd
             </div>
-            <div class="button" onclick='insertFn("afterEnd")'>
+            <div class="button" onclick='insertFn("afterEnd")' title="在当前元素之后插入一个紧邻的同辈元素">
                 afterEnd
             </div>
         </div>
