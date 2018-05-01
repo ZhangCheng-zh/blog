@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Select Range</title>
+</head>
+
+<body>
+    <p class="text">
+        The Selection API has a common behaviour (i.e. shared between browsers) that govern how focus behaviour changes for editing
+        hosts, after some of its methods are called. The behaviours is that an editing host gains focus if the previous selection
+        was outside of it, but then a Selection API method is called that causes a new selection to be made with a selection
+        range inside the editing host. Focus then moves to the editing host.
+    </p>
+    <p id='show-panel'></p>
+</body>
+<script>
+    var selectedString = '';
+    var $showPanel = document.querySelector('#show-panel');
+
+    var selectionObj = window.getSelection();
+
+    // 双击取出拖蓝区域
+    document.addEventListener('dblclick', function (e) {
+        selectedString = selectionObj.toString();
+        $showPanel.innerHTML = selectedString;
+        console.log(selectedString)
+        selectionObj.collapseToEnd();
+    }, true);
+
+    // 鼠标拖动取出拖蓝区域
+    document.addEventListener('mousemove', function (e) { }, true)
+</script>
+
+</html>

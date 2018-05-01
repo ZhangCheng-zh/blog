@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Event Capture And Bubbling</title>
+    <style>
+        .stage {
+            border: 1px solid black;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stage-one stage">
+        <div class="stage-two stage">
+            <div class="stage-three stage">
+                <div class="stage-four stage">
+                    点击这里
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var $stageOne = document.querySelector('.stage-one');
+    var $stageTwo = document.querySelector('.stage-two');
+    var $stageThree = document.querySelector('.stage-three');
+    var $stageFour = document.querySelector('.stage-four');
+
+    var $stageList = [$stageOne, $stageTwo, $stageThree, $stageFour];
+
+    function showClassName(e) {
+        var target = e.currentTarget;
+        var targetClassName = target.className;
+        console.log(targetClassName);
+    }
+
+    for (var i = 0; i < $stageList.length; i++) {
+        // 添加不捕获的事件
+        $stageList[i].addEventListener('click', function (e) {
+            showClassName(e);
+        }, true);
+    }
+</script>
+
+</html>

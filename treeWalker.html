@@ -103,7 +103,6 @@
         }
 
         if (target.dataset.index) {
-
             if ($active) {
                 $active.style.backgroundColor = 'red';
                 if ($previous) { $previous.style.backgroundColor = ''; }
@@ -113,6 +112,11 @@
         }
     })
 
+    // 创建一个range实例
+    var range = document.createRange();
+    // 设置一个起点
+    range.setStart($root, 0);
+    range.setEnd($root, 0);
 </script>
 
 </html>
