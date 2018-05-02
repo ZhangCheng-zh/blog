@@ -7,25 +7,48 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Event Capture And Bubbling</title>
     <style>
+        .button {
+            border: 1px solid black;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .active {
+            background-color: black;
+            color: #fff;
+        }
+
         .stage {
             border: 1px solid black;
             padding: 20px;
+            background-color: #fff;
         }
     </style>
 </head>
 
 <body>
-    <div class="stage-one stage">
-        <div class="stage-two stage">
-            <div class="stage-three stage">
-                <div class="stage-four stage">
-                    点击这里
+    <p class='button-list'>
+        <span class='button capture-button'>捕获模式</span>
+        <span class='button bubble-button'>冒泡模式</span>
+    </p>
+
+    <div class="stage-one stage" data-level='0'>
+        <p>stage one</p>
+        <div class="stage-two stage" data-level='1'>
+            <p>stage two</p>
+            <div class="stage-three stage" data-level='2'>
+                <p>stage three</p>
+                <div class="stage-four stage" data-level='3'>
+                    <p>stage four</p>
                 </div>
             </div>
         </div>
     </div>
 </body>
 <script>
+
+    var isCapture = true; // true: 表示捕获模式；false：表示冒泡模式
     var $stageOne = document.querySelector('.stage-one');
     var $stageTwo = document.querySelector('.stage-two');
     var $stageThree = document.querySelector('.stage-three');
@@ -33,18 +56,104 @@
 
     var $stageList = [$stageOne, $stageTwo, $stageThree, $stageFour];
 
+
+
     function showClassName(e) {
         var target = e.currentTarget;
-        var targetClassName = target.className;
-        console.log(targetClassName);
+        var targetLevel = parseInt(target.dataset.level);
+        var delayTime = ((isCapture ? targetLevel : (4 - targetLevel)) * 1000);
+
+        setTimeout(() => {
+            target.style.backgroundColor = 'red';
+        }, delayTime);
+
+        setTimeout(() => {
+            target.style.backgroundColor = '';
+        }, delayTime + 1000);
     }
 
-    for (var i = 0; i < $stageList.length; i++) {
-        // 添加不捕获的事件
-        $stageList[i].addEventListener('click', function (e) {
-            showClassName(e);
-        }, true);
+    var $buttonList = document.querySelector('.button-list');
+    var $captureButton = document.querySelector('.capture-button');
+    var $bubbleButton = document.querySelector('.bubble-button');
+
+    // 判断类名中是否有某一段值
+    function haveClass(targetDom, classValue) {
+        if (typeof targetDom != 'object' || targetDom.nodeType != 1) {
+            throw new Error('not Element DOM');
+        }
+
+        if (typeof classValue != 'string') {
+            throw new Error('the second param should be string');
+        }
+
+        if (targetDom.className.indexOf(classValue) > -1) {
+            return true;
+        }
+
+        return false;
     }
+
+    // 添加新类名
+    function addClass(targetDom, newClassValue) {
+        if (typeof targetDom != 'object' || targetDom.nodeType != 1) {
+            throw new Error('not Element DOM');
+        }
+
+        if (typeof newClassValue != 'string') {
+            throw new Error('the second param should be string');
+        }
+
+        var classValue = targetDom.getAttribute('class');
+        var lastestClassValue = classValue + ' ' + newClassValue;
+        targetDom.setAttribute('class', lastestClassValue);
+    }
+
+    // 删除指定类名
+    function removeClass(targetDom, classValue) {
+        if (typeof targetDom != 'object' || targetDom.nodeType != 1) {
+            throw new Error('not Element DOM');
+        }
+
+        if (typeof classValue != 'string') {
+            throw new Error('the second param should be string');
+        }
+
+        var oldClassValue = targetDom.getAttribute('class');
+
+        var startIndex = oldClassValue.indexOf(classValue);
+        if (startIndex > -1) {
+            newClassValue = oldClassValue.replace(classValue, '');
+            targetDom.setAttribute('class', newClassValue);
+        }
+    }
+
+    function toggleActiveButton(e) {
+        var target = e.target;
+        if (haveClass(e.target, 'capture')) {
+            removeClass($bubbleButton, 'active');
+            addClass($captureButton, 'active');
+            isCapture = true;
+        } else if (haveClass(e.target, 'bubble')) {
+            removeClass($captureButton, 'active');
+            addClass($bubbleButton, 'active');
+            isCapture = false;
+        }
+
+        // 重新绑定事件
+        for (var i = 0; i < $stageList.length; i++) {
+            // 首先移除已绑定事件
+            $stageList[i].removeEventListener('click', showClassName, !isCapture);
+            $stageList[i].removeEventListener('click', showClassName, isCapture);
+
+            // 添加新的绑定事件
+            $stageList[i].addEventListener('click', showClassName, isCapture);
+        }
+    }
+
+    $buttonList.addEventListener('click', toggleActiveButton, false);
+
+
+
 </script>
 
 </html>
