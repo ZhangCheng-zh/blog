@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTML Event Handler</title>
+</head>
+
+<body>
+    <input type="button" onclick="alert(event.type)" value="Event Type">
+    <input type="button" onclick="alert(value)" value="Value">
+
+    <form method='post'>
+        <input type='text' name='username' value=''>
+        <input type='button' value='Echo Username' onclick='alert(username.value)'>
+    </form>
+    <script>
+        function clickHandler(e, _this) {
+            console.log(e);
+            console.log(_this);
+        }
+    </script>
+</body>
+
+</html>
