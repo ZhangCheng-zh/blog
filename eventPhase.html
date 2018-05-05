@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Event Phase</title>
+</head>
+
+<body>
+    <input type="button" value="button" id='btn'>
+    <script>
+        document.body.addEventListener('click', function () {
+            alert('Event Phase: ' + event.eventPhase + ', click on body capture');
+        }, true);
+
+        document.body.addEventListener('click', function () {
+            alert('Event Phase: ' + event.eventPhase + ', click on body bubble');
+        }, false);
+
+        var $btn = document.getElementById('btn');
+        $btn.addEventListener('click', function () {
+            alert('Event Phase: ' + event.eventPhase + ', click on button bubble');
+        }, false)
+
+    </script>
+</body>
+
+</html>

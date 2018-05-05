@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>阻止默认行为</title>
+</head>
+
+<body>
+    <a href="https://www.baidu.com" target="_blank" id='link'>baidu</a>
+    <input type="button" value="preventDefault" id='preventBtn' title='删除链接跳转的默认行为'>
+
+    <input type="button" value="stopPropagation" id='stopBtn' title='阻止点击链接的冒泡行为'>
+    <script>
+        var $link = document.getElementById('link');
+        var $preventBtn = document.getElementById('preventBtn');
+        var $stopBtn = document.getElementById('stopBtn');
+
+        document.body.addEventListener('click', function (e) {
+            alert('body alert');
+        }, false);
+
+        var preventHandler = function (event) {
+            event.preventDefault();
+            alert('prevent link success');
+        };
+
+        var stopHandler = function (event) {
+            event.stopPropagation();
+            alert('stop bubble success')
+        }
+
+        $preventBtn.addEventListener('click', function () {
+            $link.addEventListener('click', preventHandler)
+            event.stopPropagation();
+        }, false)
+
+        $stopBtn.addEventListener('click', function () {
+            $link.addEventListener('click', stopHandler);
+            event.stopPropagation();
+        }, false);
+    </script>
+</body>
+
+</html>

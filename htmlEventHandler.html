@@ -15,12 +15,17 @@
     <form method='post'>
         <input type='text' name='username' value=''>
         <input type='button' value='Echo Username' onclick='alert(username.value)'>
+        <input type='button' value='Attach Event' id='myBtn'>
     </form>
     <script>
         function clickHandler(e, _this) {
             console.log(e);
             console.log(_this);
         }
+        var $btn = document.getElementById('myBtn');
+        $btn.attachEvent('onclick', function () {
+            alert(this === window);
+        })
     </script>
 </body>
 

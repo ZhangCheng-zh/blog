@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>EventUtil</title>
+</head>
+
+<body>
+    <input type='button' value='Event' id='btn'>
+    <input type='button' value='Create Event' id='createBtn'>
+    <input type='button' value='Remove Event' id='removeBtn'>
+    <script>
+        var EventUtil = {
+            addHandler: function (element, type, handler) {
+                if (element.addEventListener) {
+                    element.addEventListener(type, handler, false)
+                } else if (element.attachEvent) {
+                    element.attachEvent('on' + type, handler);
+                } else {
+                    element['on' + type] = handler;
+                }
+            },
+            removeHandler: function (element, type, handler) {
+                if (element.removeEventListener) {
+                    element.removeEventListener(type, handler, false)
+                } else if (element.detachEvent) {
+                    element.detach('on' + type, handler);
+                } else {
+                    element['on' + type] = null;
+                }
+            }
+        }
+        $btn = document.getElementById('btn');
+        $createBtn = document.getElementById('createBtn');
+        $removeBtn = document.getElementById('removeBtn');
+
+        var handler = function () {
+            alert('Event Active');
+        }
+        var addHandler = function () {
+            EventUtil.addHandler($btn, 'click', handler);
+        }
+
+        var removeHandler = function () {
+            EventUtil.removeHandler($btn, 'click', handler);
+        }
+
+        EventUtil.addHandler($createBtn, 'click', addHandler);
+        EventUtil.addHandler($removeBtn, 'click', removeHandler);
+    </script>
+</body>
+
+</html>
