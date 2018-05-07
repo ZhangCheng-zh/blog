@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Image Load</title>
+</head>
+
+<body>
+    <ul id='ul-list'>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+        <li>
+            <img src="https://avatars3.githubusercontent.com/u/357098?v=4" alt="">
+        </li>
+    </ul>
+    <script>
+        window.onload = function (e) {
+            notifyMe('window loaded');
+
+            var $img = document.createElement('img');
+            $img.addEventListener('load', function (e) {
+                notifyMe('img be loaded');
+            })
+            document.body.appendChild($img);
+            $img.src = 'https://avatars3.githubusercontent.com/u/357098?v=4';
+        }
+
+        window.addEventListener('unload', function () {
+            notifyMe('Be closed');
+        });
+
+        // resize触发事件
+        window.addEventListener('resize', function () {
+            notifyMe('Window is resized')
+        });
+
+        // scroll触发事件
+        window.addEventListener('scroll', function (e) {
+            var $ul = document.getElementById('ul-list');
+            var body = document.body; // Safari
+            var html = document.documentElement; //
+            notifyMe(body.scrollTop || html.scrollTop);
+        })
+
+
+
+
+        function notifyMe(str) {
+            if (!("Notification" in window)) {
+                alert('This broswer does not support desktop notification');
+            }
+
+            // Let's check whether notification permissions have already been granted
+            else if (Notification.permission === "granted") {
+                // If it's okay let's create a notification
+                var notification = new Notification(str);
+            }
+
+            // Otherwise, we need to ask the user for permission
+            else if (Notification.permission !== "denied") {
+                Notification.requestPermission(function (permission) {
+                    // If the user accepts, let's create a notification
+                    if (permission === "granted") {
+                        var notification = new Notification(str);
+                    }
+                });
+            }
+        }
+
+    </script>
+</body>
+
+</html>
