@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>UI Event Demo</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    // window.addEventListener('load', function (event) {
+    //     alert('window loaded, ' + event.type);
+    // });
+
+    // window.addEventListener('beforeunload', function () {
+    //     console.log('window will unload, ' + event.type);
+    // })
+
+    // window.addEventListener('unload', function () {
+    //     alert('window unloaded, ' + event.type);
+    // })
+
+    window.onload = function () {
+        alert('window loaded');
+    }
+
+    window.addEventListener("beforeunload", function (event) {
+        window.alert('will unload');
+    });
+
+</script>
+
+</html>
