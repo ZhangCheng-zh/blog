@@ -31,6 +31,16 @@
             <label for="mouseout">Mouseout Event On Stage One</label>
         </div>
     </form>
+    <form action="">
+        <div>
+            <label for="clientX">clientX</label>
+            <input type="text" name="clientX" id="clientX" value='1' readonly>
+        </div>
+        <div>
+            <label for="clientY">clientY</label>
+            <input type="text" name="clientY" id="clientY" value='2' readonly>
+        </div>
+    </form>
     <div class="container">
         <div id='stageOne' class='container'>
             1
@@ -50,6 +60,7 @@
     </div>
     <script type="module">
         import { notifyMe } from './js/notify.js';
+
 
         var $stageFour = document.getElementById('stageFour');
         var $stageFive = document.getElementById('stageFive');
@@ -138,8 +149,18 @@
             notifyMe(stageFiveValue);
         })
 
+        var $clientX = document.getElementById('clientX');
+        var $clientY = document.getElementById('clientY');
+
+        function mousePositionHandler() {
+            window.addEventListener('mousemove', function (e) {
+                $clientX.value = e.clientX;
+                $clientY.value = e.clientY;
+            })
+        }
         function init() {
             $stageFive.innerText = stageFiveValue;
+            mousePositionHandler();
         }
 
         init();
