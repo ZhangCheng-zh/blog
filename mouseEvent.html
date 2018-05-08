@@ -1,39 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mouse Event Demo</title>
 </head>
+
 <body>
-        <div id='stageOne' class='container'>
-            <div id='stageTwo' class='container'>
-                <div id='stageThree' class='container'>
-                    <div id='stageFour' class='container'>
-                        <div id='stageFive' class='container'>
-                            (⊙o⊙)？
-                        </div>    
-                    </div>    
-                </div>    
-            </div>    
+    <form action="">
+        <div>
+            <input type="checkbox" name="mouseover" id="mouseover" value='1'>
+            <label for="mouseover">Mouseover Event On Stage One</label>
         </div>
+        <div>
+            <input type="checkbox" name="mouseenter" id="mouseenter" value='1'>
+            <label for="mouseenter">Mouseenter Event On Stage One</label>
+        </div>
+        <div>
+            <input type="checkbox" name="mouseleave" id="mouseleave" value='1'>
+            <label for="mouseleave">Mouseleave Event On Stage One</label>
+        </div>
+        <div>
+            <input type="checkbox" name="mousemove" id="mousemove" value='1'>
+            <label for="mousemove">Mousemove Event On Stage One</label>
+        </div>
+        <div>
+            <input type="checkbox" name="mouseout" id="mouseout" value='1'>
+            <label for="mouseout">Mouseout Event On Stage One</label>
+        </div>
+    </form>
+    <div class="container">
+        <div id='stageOne' class='container'>
+            1
+            <div id='stageTwo' class='container'>
+                2
+                <div id='stageThree' class='container'>
+                    3
+                    <div id='stageFour' class='container'>
+                        4
+                        <div id='stageFive' class='container'>
+                            5
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="module">
         import { notifyMe } from './js/notify.js';
 
+        var $stageFour = document.getElementById('stageFour');
         var $stageFive = document.getElementById('stageFive');
+        var $stageThree = document.getElementById('stageThree');
+        var $stageTwo = document.getElementById('stageTwo');
+        var $stageOne = document.getElementById('stageOne');
 
-        $stageFive.addEventListener('mousedown', function () {})
+        var stageFiveValue = $stageFive.innerText;
+
+        var $mouseover = document.getElementById('mouseover');
+        var $mouseenter = document.getElementById('mouseenter');
+        var $mouseleave = document.getElementById('mouseleave');
+        var $mousemove = document.getElementById('mousemove');
+        var $mouseout = document.getElementById('mouseout');
+
+        function mouseHandler(e) {
+            e.preventDefault();
+
+            stageFiveValue++;
+            $stageFive.innerText = stageFiveValue;
+        }
+
+        var eventsObj = [
+            {
+                eventType: 'mouseover',
+                eventTarget: $mouseover
+            }, {
+                eventType: 'mouseenter',
+                eventTarget: $mouseenter
+            }, {
+                eventType: 'mouseleave',
+                eventTarget: $mouseleave
+            }, {
+                eventType: 'mousemove',
+                eventTarget: $mousemove
+            }, {
+                eventType: 'mouseout',
+                eventTarget: $mouseout
+            },
+        ];
+
+        function eventDemoHandler(eventList) {
+            if (Array.isArray(eventList) && eventList.length) {
+                for (let item of eventList) {
+                    ((item) => {
+                        var addHandler = function () {
+                            $stageOne.addEventListener(item.eventType, mouseHandler);
+                        }
+
+                        var removeHandler = function () {
+                            $stageOne.removeEventListener(item.eventType, mouseHandler);
+                        }
+
+                        item.eventTarget.addEventListener('change', function (e) {
+                            this.checked ? addHandler() : removeHandler();
+                        })
+                    })(item);
+                }
+            }
+        }
+
+        eventDemoHandler(eventsObj);
+
+
+        $stageFive.addEventListener('mousedown', function (e) {
+            this.style.background = '#000';
+        })
+
+        $stageFive.addEventListener('mouseup', function (e) {
+            this.style.background = '#fff';
+        })
+
+        $stageFive.addEventListener('click', function () {
+            stageFiveValue++;
+            $stageFive.innerText = stageFiveValue;
+        })
+
+        $stageFive.addEventListener('dblclick', function () {
+            stageFiveValue = (stageFiveValue - 2) * 2;
+            $stageFive.innerText = stageFiveValue;
+        })
+
+        $stageFive.addEventListener('mousewheel', function () {
+            stageFiveValue++;
+            $stageFive.innerText = stageFiveValue;
+            notifyMe(stageFiveValue);
+        })
+
+        function init() {
+            $stageFive.innerText = stageFiveValue;
+        }
+
+        init();
     </script>
     <style>
-        html,body {
+        html,
+        body {
             box-sizing: border-box;
             width: 100%;
             height: 100%;
             margin: 0;
             padding: 0;
-        }    
-        body,.container {
+        }
+
+
+        .container {
             display: flex;
             justify-content: space-around;
             align-items: center;
@@ -43,9 +165,11 @@
             cursor: pointer;
             background: #fff;
         }
-        .container:hover {
+
+        /* .container:hover {
             background: black;
-        }
+        } */
     </style>
 </body>
+
 </html>
