@@ -9,6 +9,7 @@
 </head>
 
 <body>
+
     <form action="">
         <div>
             <input type="checkbox" name="mouseover" id="mouseover" value='1'>
@@ -33,6 +34,16 @@
     </form>
     <form action="">
         <div>
+            <label for="screenX">screenX</label>
+            <input type="text" name="screenX" id="screenX" value='' readonly>
+        </div>
+        <div>
+            <label for="screenY">screenY</label>
+            <input type="text" name="screenY" id="screenY" value='' readonly>
+        </div>
+    </form>
+    <form action="">
+        <div>
             <label for="clientX">clientX</label>
             <input type="text" name="clientX" id="clientX" value='1' readonly>
         </div>
@@ -41,7 +52,33 @@
             <input type="text" name="clientY" id="clientY" value='2' readonly>
         </div>
     </form>
-    <div class="container">
+    <form action="">
+        <div>
+            <label for="pageX">pageX</label>
+            <input type="text" name="pageX" id="pageX" value='1' readonly>
+        </div>
+        <div>
+            <label for="pageY">pageY</label>
+            <input type="text" name="pageY" id="pageY" value='2' readonly>
+        </div>
+    </form>
+    <form action="">
+        <div>
+            <label for="scrollLeft">scrollLeft</label>
+            <input type="text" name="scrollLeft" id="scrollLeft" value='' readonly>
+        </div>
+        <div>
+            <label for="scrollTop">scrollTop</label>
+            <input type="text" name="scrollTop" id="scrollTop" value='' readonly>
+        </div>
+    </form>
+    <form action="">
+        <input type="button" name="ctrl" id="ctrl" value='ctrl'>
+        <input type="button" name="shift" id="shift" value='shift'>
+        <input type="button" name="alt" id="alt" value='alt'>
+        <input type="button" name="meta" id="meta" value='meta'>
+    </form>
+    <div class="container" style='width:800px; height:800px;'>
         <div id='stageOne' class='container'>
             1
             <div id='stageTwo' class='container'>
@@ -149,15 +186,29 @@
             notifyMe(stageFiveValue);
         })
 
+        var $screenX = document.getElementById('screenX');
+        var $screenY = document.getElementById('screenY');
         var $clientX = document.getElementById('clientX');
         var $clientY = document.getElementById('clientY');
+        var $pageX = document.getElementById('pageX');
+        var $pageY = document.getElementById('pageY');
+        var $scrollLeft = document.getElementById('scrollLeft');
+        var $scrollTop = document.getElementById('scrollTop');
+
 
         function mousePositionHandler() {
             window.addEventListener('mousemove', function (e) {
+                $screenX.value = e.screenX;
+                $screenY.value = e.screenY;
                 $clientX.value = e.clientX;
                 $clientY.value = e.clientY;
+                $pageX.value = e.pageX;
+                $pageY.value = e.pageY;
+                $scrollLeft.value = document.documentElement.scrollLeft;
+                $scrollTop.value = document.documentElement.scrollTop;
             })
         }
+
         function init() {
             $stageFive.innerText = stageFiveValue;
             mousePositionHandler();
