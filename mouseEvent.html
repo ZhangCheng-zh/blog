@@ -113,8 +113,17 @@
         var $mousemove = document.getElementById('mousemove');
         var $mouseout = document.getElementById('mouseout');
 
+        var colorNum = 0;
         function mouseHandler(e) {
             e.preventDefault();
+
+            if (e.type == 'mouseover' || e.type == 'mouseout') {
+                colorNum++;
+                colorNum = colorNum % 16;
+                var color = '#' + colorNum.toString(16) + colorNum.toString(16) + colorNum.toString(16)
+                e.relatedTarget.style.background = color;
+                e.target.style.background = '#fff';
+            }
 
             stageFiveValue++;
             $stageFive.innerText = stageFiveValue;
@@ -164,15 +173,18 @@
 
         $stageFive.addEventListener('mousedown', function (e) {
             this.style.background = '#000';
+            notifyMe('e.button: ' + e.button);
         })
 
         $stageFive.addEventListener('mouseup', function (e) {
             this.style.background = '#fff';
+            notifyMe('e.button: ' + e.button);
         })
 
-        $stageFive.addEventListener('click', function () {
+        $stageFive.addEventListener('click', function (e) {
             stageFiveValue++;
             $stageFive.innerText = stageFiveValue;
+            notifyMe('Click Number: ' + e.detail);
         })
 
         $stageFive.addEventListener('dblclick', function () {
@@ -180,10 +192,10 @@
             $stageFive.innerText = stageFiveValue;
         })
 
-        $stageFive.addEventListener('mousewheel', function () {
+        $stageFive.addEventListener('mousewheel', function (e) {
             stageFiveValue++;
             $stageFive.innerText = stageFiveValue;
-            notifyMe(stageFiveValue);
+            notifyMe('wheelDelta: ' + e.wheelDelta);
         })
 
         var $screenX = document.getElementById('screenX');
@@ -194,6 +206,11 @@
         var $pageY = document.getElementById('pageY');
         var $scrollLeft = document.getElementById('scrollLeft');
         var $scrollTop = document.getElementById('scrollTop');
+
+        var $ctrl = document.getElementById('ctrl');
+        var $shift = document.getElementById('shift');
+        var $alt = document.getElementById('alt');
+        var $meta = document.getElementById('meta');
 
 
         function mousePositionHandler() {
@@ -206,6 +223,38 @@
                 $pageY.value = e.pageY;
                 $scrollLeft.value = document.documentElement.scrollLeft;
                 $scrollTop.value = document.documentElement.scrollTop;
+
+                if (e.ctrlKey) {
+                    $ctrl.style.background = '#000';
+                    $ctrl.style.color = '#fff';
+                } else {
+                    $ctrl.style.background = '#fff';
+                    $ctrl.style.color = '#000';
+                }
+
+                if (e.shiftKey) {
+                    $shift.style.background = '#000';
+                    $shift.style.color = '#fff';
+                } else {
+                    $shift.style.background = '#fff';
+                    $shift.style.color = '#000';
+                }
+
+                if (e.altKey) {
+                    $alt.style.background = '#000';
+                    $alt.style.color = '#fff';
+                } else {
+                    $alt.style.background = '#fff';
+                    $alt.style.color = '#000';
+                }
+
+                if (e.metaKey) {
+                    $meta.style.background = '#000';
+                    $meta.style.color = '#fff';
+                } else {
+                    $meta.style.background = '#fff';
+                    $meta.style.color = '#000';
+                }
             })
         }
 
