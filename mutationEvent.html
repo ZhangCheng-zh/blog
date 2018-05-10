@@ -19,6 +19,7 @@
         <li>子段落</li>
         <li>子段落</li>
     </ul>
+    <div id="myMenu">我的自定义菜单</div>
     <script type='module'>
         import { notifyMe } from './js/notify.js';
 
@@ -69,7 +70,7 @@
 
         window.addEventListener('DOMContentLoaded', function () {
             document.body.addEventListener('DOMSubtreeModified', function () {
-                notifyMe('DOMSubtreeModified');
+                // notifyMe('DOMSubtreeModified');
                 console.log('DOMSubtreeModified');
             });
 
@@ -87,10 +88,40 @@
                 notifyMe('DOMCharacterDataModified');
                 console.log('DOMCharacterDataModified');
             });
+
+            document.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+                notifyMe('contextmenu');
+
+                var myMenu = document.querySelector('#myMenu');
+                myMenu.style.left = e.clientX + 'px';
+                myMenu.style.top = e.clientY + 'px';
+                myMenu.style.visibility = 'visible';
+            })
+
+            document.addEventListener('click', function (e) {
+                var myMenu = document.querySelector('#myMenu');
+                if (myMenu.style.visibility == 'visible') {
+                    myMenu.style.visibility = 'hidden';
+                }
+            });
+
+            window.addEventListener('beforunload', function (e) {
+                var message = 'are you sure?'
+                e.returnValue = message;
+                notifyMe(message);
+                return message;
+            })
+
+
         });
-
-
     </script>
+    <style>
+        #myMenu {
+            position: fixed;
+            visibility: hidden;
+        }
+    </style>
 </body>
 
 </html>
