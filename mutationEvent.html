@@ -10,8 +10,10 @@
 
 <body>
     <h2>Mutation Event Demo</h2>
-    <input type="button" value="Insert DOM">
-    <ul>
+    <input type="button" value="Insert DOM" id="insert">
+    <input type="button" value="Remove DOM" id="remove">
+    <input type="button" value="Change Inner Text" id="change">
+    <ul id='dom-container'>
         <li>子段落</li>
         <li>子段落</li>
         <li>子段落</li>
@@ -19,6 +21,75 @@
     </ul>
     <script type='module'>
         import { notifyMe } from './js/notify.js';
+
+        var $insert = document.querySelector('#insert');
+        var $remove = document.querySelector('#remove');
+        var $change = document.querySelector('#change');
+
+        function addEventListenerHandler(dom) {
+            if (dom && dom.nodeType == 1) {
+                dom.addEventListener('DOMNodeInsertedIntoDocument', function (e) {
+                    notifyMe('DOMNodeInsertedIntoDocument');
+                    console.log('DOMNodeInsertedIntoDocument');
+                });
+
+                dom.addEventListener('DOMNodeRemovedFromDocument', function (e) {
+                    notifyMe('DOMNodeRemovedFromDocument');
+                    console.log('DOMNodeRemovedFromDocument');
+                });
+
+            }
+        }
+
+        function insertDomHandler(dom) {
+            if (dom && dom.nodeType == 1) {
+                var $ul = document.querySelector('#dom-container');
+                addEventListenerHandler(dom);
+                $ul.appendChild(dom);
+            }
+        }
+
+        function removeDomHandler() {
+            var $ul = document.querySelector('#dom-container');
+            $ul.lastElementChild.remove();
+        }
+
+        $insert.addEventListener('click', function (e) {
+            var $li = document.createElement('li');
+            $li.innerText = '子段落';
+            insertDomHandler($li);
+        })
+
+        $remove.addEventListener('click', removeDomHandler);
+
+        $change.addEventListener('click', function () {
+            var $ul = document.querySelector('#dom-container');
+            $ul.lastElementChild.innerText = Math.random() * 100;
+        })
+
+        window.addEventListener('DOMContentLoaded', function () {
+            document.body.addEventListener('DOMSubtreeModified', function () {
+                notifyMe('DOMSubtreeModified');
+                console.log('DOMSubtreeModified');
+            });
+
+            document.body.addEventListener('DOMNodeInserted', function () {
+                notifyMe('DOMNodeInserted');
+                console.log('DOMNodeInserted');
+            });
+
+            document.body.addEventListener('DOMNodeRemoved', function () {
+                notifyMe('DOMNodeRemoved');
+                console.log('DOMNodeRemoved');
+            });
+
+            document.body.addEventListener('DOMCharacterDataModified', function () {
+                notifyMe('DOMCharacterDataModified');
+                console.log('DOMCharacterDataModified');
+            });
+        });
+
+
     </script>
 </body>
 
