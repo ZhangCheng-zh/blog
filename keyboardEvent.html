@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Keyboard Event</title>
+</head>
+
+<body>
+    <h2>Keyboard Event Demo</h2>
+    <input type="text" id='text-input'>
+    <br/>
+    <br/>
+    <form action="">
+        <input type="button" name="ctrl" id="ctrl" value='ctrl'>
+        <input type="button" name="shift" id="shift" value='shift'>
+        <input type="button" name="alt" id="alt" value='alt'>
+        <input type="button" name="meta" id="meta" value='meta'>
+    </form>
+    <script type='module'>
+        import { notifyMe } from './js/notify.js';
+
+        class KeyboardEvent {
+            constructor(config) {
+                this.notifyMe = notifyMe;
+
+                this.keydownCount = 0;
+                this.keypressCount = 0;
+                this.keyupCount = 0;
+                this.textInputCount = 0;
+                this.DOM = {};
+                this.DOM = config.DOM || {};
+
+                let vm = this;
+                if (vm.DOM.$textInput.nodeType == 1) {
+                    vm.DOM.$textInput.addEventListener('keydown', function (e) {
+                        let consoleStr = '\nevent.key:' + e.key
+                            + '\nevent.char:' + e.char
+                            + '\nevent.code:' + e.code
+                            + '\nevent.location:' + e.location;
+
+                        vm.notifyMe('keydown count:' + vm.keydownCount + consoleStr);
+                        console.log('keydown count:' + vm.keydownCount + consoleStr);
+                        vm.keydownCount++;
+                    });
+                    vm.DOM.$textInput.addEventListener('keypress', function (e) {
+                        let consoleStr = '\nevent.key:' + e.key
+                            + '\nevent.char:' + e.char
+                            + '\nevent.code:' + e.code
+                            + '\nevent.location:' + e.location;
+
+                        vm.notifyMe('keypress count:' + vm.keypressCount + consoleStr);
+                        console.log('keypress count:' + vm.keypressCount + consoleStr);
+                        vm.keypressCount++;
+                    });
+                    vm.DOM.$textInput.addEventListener('keyup', function (e) {
+                        let consoleStr = '\nevent.key:' + e.key
+                            + '\nevent.char:' + e.char
+                            + '\nevent.code:' + e.code
+                            + '\nevent.location:' + e.location;
+
+                        vm.notifyMe('keyup count:' + vm.keyupCount + consoleStr);
+                        console.log('keyup count:' + vm.keyupCount + consoleStr);
+                        vm.keyupCount++;
+
+                        if (e.ctrlKey) {
+                            vm.DOM.$ctrl.style.background = '#000';
+                            setTimeout(() => { vm.DOM.$ctrl.style.background = '#fff'; }, 1000)
+                        }
+                        if (e.altKey) {
+                            vm.DOM.$alt.style.background = '#000';
+                            setTimeout(() => { vm.DOM.$alt.style.background = '#fff'; }, 1000)
+                        }
+                        if (e.shiftKey) {
+                            vm.DOM.$shift.style.background = '#000';
+                            setTimeout(() => { vm.DOM.$shift.style.background = '#fff'; }, 1000)
+                        }
+                        if (e.metaKey) {
+                            vm.DOM.$meta.style.background = '#000';
+                            setTimeout(() => { vm.DOM.$meta.style.background = '#fff'; }, 1000)
+                        }
+                    });
+                    vm.DOM.$textInput.addEventListener('textInput', function (e) {
+                        vm.notifyMe('textInput count:' + vm.textInputCount + ', event.data:' + e.data);
+                        console.log('textInput count:' + vm.textInputCount + ', event.data:' + e.data);
+                        vm.textInputCount++;
+                    })
+                    vm.DOM.$textInput.addEventListener('compositionstart', function (e) {
+                        vm.notifyMe('compositionstart data: ' + e.data);
+                        console.log('输入法打开了' + ', compositionstart data: ' + e.data);
+                    });
+
+                    vm.DOM.$textInput.addEventListener('compositionupdate', function (e) {
+                        vm.notifyMe('compositionupdate data: ' + e.data);
+                        console.log('输入更新了' + ', compositionupdate data: ' + e.data);
+                    });
+
+                    vm.DOM.$textInput.addEventListener('compositionend', function (e) {
+                        vm.notifyMe('compositionend data: ' + e.data);
+                        console.log('新类型字符完成输入了' + ', compositionend data: ' + e.data);
+                    });
+                }
+            }
+        }
+
+        let $textInput = document.querySelector('#text-input');
+        let $ctrl = document.querySelector('#ctrl');
+        let $alt = document.querySelector('#alt');
+        let $shift = document.querySelector('#shift');
+        let $meta = document.querySelector('#meta');
+
+        let KeyboardEventDemo = new KeyboardEvent({ DOM: { $textInput, $ctrl, $alt, $shift, $meta } });
+    </script>
+    <style>
+    </style>
+
+</body>
+
+</html>
