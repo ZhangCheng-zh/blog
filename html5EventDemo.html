@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTML5 Event</title>
+</head>
+
+<body>
+    <h2>HTML5 Event Demo</h2>
+
+    <div id="myMenu">我的自定义菜单</div>
+    <script type='module'>
+        import { notifyMe } from './js/notify.js';
+
+        (function () {
+            var pageshowCount = 0;
+
+            window.addEventListener('pageshow', function (e) {
+                pageshowCount++;
+                notifyMe('page show: ' + pageshowCount + ', persisted: ' + e.persisted);
+            });
+
+            window.addEventListener('pagehide', function (e) {
+                pageshowCount++;
+                notifyMe('page hide, ' + 'persisted: ' + e.persisted);
+            })
+
+            // 监听url变化
+            if ("onhashchange" in window) {
+
+            }
+            window.addEventListener('hashchange', function (e) {
+
+                notifyMe('old URL: ' + e.oldURL + ', new URL: ' + e.newURL);
+                console.log(e);
+            })
+        })()
+
+        document.addEventListener('readystatechange', function (e) {
+            if (document.readyState == 'interactive' || document.readyState == 'complete') {
+                notifyMe('document load');
+                console.log('document load');
+            }
+        });
+
+
+
+
+
+    </script>
+    <style>
+    </style>
+</body>
+
+</html>

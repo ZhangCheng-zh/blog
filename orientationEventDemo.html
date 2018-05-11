@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Orientation Event Demo</title>
+</head>
+
+<body>
+    <h2>Device Event Demo</h2>
+    <div>
+        <label for="Orientation">orientation value: </label>
+        <input type="text" id='Orientation' value='no related value'>
+    </div>
+    <div>
+        <label for="DeviceOrientationAlpha">DeviceOrientationAlpha value: </label>
+        <input type="text" id='DeviceOrientationAlpha' value='no related value'>
+        <label for="DeviceOrientationBeta">DeviceOrientationBeta value: </label>
+        <input type="text" id='DeviceOrientationBeta' value='no related value'>
+        <label for="DeviceOrientationGamma">DeviceOrientationGamma value: </label>
+        <input type="text" id='DeviceOrientationGamma' value='no related value'>
+        <label for="DeviceOrientationAbsolute">DeviceOrientationAbsolute value: </label>
+        <input type="text" id='DeviceOrientationAbsolute' value='no related value'>
+        <label for="DeviceOrientationCompassCalibrated">DeviceOrientationCompassCalibrated value: </label>
+        <input type="text" id='DeviceOrientationCompassCalibrated' value='no related value'>
+        <br>
+        <label for="DeviceMotion">DeviceMotion value: </label>
+        <input type="text" id='DeviceMotion' value='no related value'>
+    </div>
+    <script>
+        (function (window) {
+            var $Orientation = document.querySelector('#Orientation');
+            var $DeviceOrientationAlpha = document.querySelector('#DeviceOrientationAlpha');
+            var $DeviceOrientationBeta = document.querySelector('#DeviceOrientationBeta');
+            var $DeviceOrientationGamma = document.querySelector('#DeviceOrientationGamma');
+            var $DeviceOrientationAbsolute = document.querySelector('#DeviceOrientationAbsolute');
+            var $DeviceOrientationCompassCalibrated = document.querySelector('#DeviceOrientationCompassCalibrated');
+            var $DeviceMotion = document.querySelector('#DeviceMotion');
+            if (window.orientation) {
+                window.addEventListener('orientationchange', function (e) {
+                    $Orientation.value = window.orientation;
+                })
+            }
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function (e) {
+                    $DeviceOrientationAlpha.value = e.alpha.toFixed(2);
+                    $DeviceOrientationBeta.value = e.beta.toFixed(2);
+                    $DeviceOrientationGamma.value = e.gamma.toFixed(2);
+                    $DeviceOrientationAbsolute.value = e.absolute;
+                    $DeviceOrientationCompassCalibrated.value = e.compassCalibrated;
+                })
+            }
+
+            window.addEventListener('devicemotion', function (e) {
+                $DeviceMotion.value = e.accelerationIncludingGravity.x.toFixed(0)
+                    + ' ' + e.accelerationIncludingGravity.y.toFixed(0)
+                    + ' ' + e.accelerationIncludingGravity.z.toFixed(0);
+            })
+
+        })(window)
+    </script>
+</body>
+
+</html>
