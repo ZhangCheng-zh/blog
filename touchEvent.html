@@ -10,12 +10,29 @@
 
 <body>
     <h2>Touch Event Demo</h2>
-    <div id="output"></div>
+    <div id="output">demo</div>
     <script>
         ((window) => {
             var $output = document.querySelector('#output');
 
+            var touchHandler = function (e) {
+                switch (e.type) {
+                    case 'touchstart':
+                        $output.innerHTML = `Touch start at ${e.touches[0].clientX}, ${e.touches[0].clientY}`;
+                        break;
+                    case 'touchmove':
+                        e.preventDefault();
+                        $output.innerHTML = `Touch move at ${e.changedtouches[0].clientX}, ${e.changedtouches[0].clientY}`;
+                        break;
+                    case 'touchend':
+                        $output.innerHTML = `Touch end at ${e.changedtouches[0].clientX}, ${e.changedtouches[0].clientY}`;
+                        break;
+                }
+            }
 
+            document.addEventListener('touchstart', touchHandler);
+            document.addEventListener('touchmove', touchHandler);
+            document.addEventListener('touchend', touchHandler);
         })(window)
     </script>
 </body>
