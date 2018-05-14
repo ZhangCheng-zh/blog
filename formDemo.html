@@ -39,6 +39,15 @@
             <br>
             <button type="text" id='resetJsButton'>重置(javascript)</button>
         </fieldset>
+
+        <fieldset>
+            <h5>文本框演示</h5>
+            <input type="text" size="25" maxlength="50" value="initial value" id='inputDom'>
+            <br>
+            <br>
+            <textarea name="" cols="30" rows="10" id='textareaDom'>initial value
+            </textarea>
+        </fieldset>
     </form>
     <script>
         (function (window) {
@@ -101,6 +110,24 @@
             });
 
 
+
+            var $textareaDom = document.querySelector('#textareaDom');
+
+            $textareaDom.addEventListener('focus', function (e) {
+                this.setSelectionRange(0, 4);
+            });
+
+            $textareaDom.addEventListener('select', function (e) {
+            })
+
+            var $inputDom = document.querySelector('#inputDom');
+            $inputDom.addEventListener('keypress', function (e) {
+                var charCode = e.charCode;
+                console.log(charCode);
+                if (!/\d/.test(String.fromCharCode(charCode))) {
+                    e.preventDefault();
+                }
+            })
 
         })(window)
     </script>
