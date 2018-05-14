@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Form Demo</title>
+</head>
+
+<body>
+    <ul>
+        <li>
+            <label for="resetControl">是否拦截重置事件：</label>
+            <input type="checkbox" name="resetControl" id="resetControl">
+        </li>
+        <li>
+            <input type="button" name="elementsList" id="elementsList" value='遍历表单字段elements' tabindex="-1">
+        </li>
+    </ul>
+    <form action="" id='formOne'>
+        <fieldset>
+            <input type="text" value="input value" id='textInput'>
+            <br>
+            <input type="date" name="" id="">
+        </fieldset>
+        <fieldset>
+            <input type="submit" value="提交(input)">
+            <br>
+            <button type="submit">提交(button)</button>
+            <br>
+            <input type="image" src="" alt="提交（image）">
+        </fieldset>
+
+        <fieldset>
+            <input type="reset" value="重置(input)">
+            <br>
+            <button type="reset">重置(button)</button>
+            <br>
+            <button type="text" id='resetJsButton'>重置(javascript)</button>
+        </fieldset>
+    </form>
+    <script>
+        (function (window) {
+            var $formOne = document.querySelector('#formOne');
+            var $controlReset = document.querySelector('#resetControl');
+
+            var resetEventHandler = function (e) {
+                e.preventDefault();
+                alert('reset fail');
+            };
+
+            //避免多次提交
+            $formOne.addEventListener('submit', function (e) {
+                console.log(e.target.elements['submit']);
+            })
+
+            // 控制重置
+            $controlReset.addEventListener('change', function (e) {
+                if (e.target.checked) {
+                    $formOne.addEventListener('reset', resetEventHandler);
+                } else {
+                    $formOne.removeEventListener('reset', resetEventHandler);
+                }
+            });
+
+            var $showElementsList = document.querySelector('#elementsList');
+            $showElementsList.addEventListener('click', function (e) {
+                console.log($formOne.elements);
+            });
+
+            var $resetJsButton = document.querySelector('#resetJsButton');
+            $resetJsButton.addEventListener('click', function () {
+                $formOne.reset();
+            })
+
+            document.addEventListener('DOMContentLoaded', function (e) {
+                var $textInput = document.querySelector('#textInput');
+                var $elementsList = document.querySelector('#elementsList');
+                if ($elementsList.autofocus) {
+                    alert('Auto focused');
+                } else {
+                    $elementsList.focus();
+                }
+
+                $textInput.addEventListener('change', function (e) {
+                    alert('change event fire');
+                });
+
+                // 获取焦点时改变背景颜色和字体颜色
+                $textInput.addEventListener('focus', function (e) {
+                    this.style.background = '#000';
+                    this.style.color = '#fff';
+                });
+
+                // 失去焦点时还原背景颜色和字体颜色
+                $textInput.addEventListener('blur', function (e) {
+                    this.style.background = '';
+                    this.style.color = '';
+                });
+            });
+
+
+
+        })(window)
+    </script>
+</body>
+
+</html>
