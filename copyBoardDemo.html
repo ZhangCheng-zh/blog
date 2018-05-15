@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Copy Paste Cut Demo</title>
+</head>
+
+<body>
+    <h3>剪贴板事件演示</h3>
+    <input type="text" value="操作的">
+    <script>
+        (function (window) {
+            document.addEventListener('beforecopy', function (e) {
+                alert('before copy');
+                console.log(e.clipboardData.getData('text'));
+            })
+            document.addEventListener('copy', function (e) {
+                alert('copy');
+                console.log(e.clipboardData.getData('text'));
+            })
+            document.addEventListener('beforecut', function (e) {
+                alert('before cut');
+                console.log(e.clipboardData.getData('text'));
+            })
+            document.addEventListener('cut', function (e) {
+                alert('cut');
+                console.log(e.clipboardData.getData('text'));
+            })
+            document.addEventListener('beforepaste', function (e) {
+                alert('before paste');
+                console.log(e.clipboardData.getData('text'));
+            })
+            document.addEventListener('paste', function (e) {
+                alert('paste');
+                console.log(e.clipboardData.getData('text'));
+            })
+        })(window)
+    </script>
+</body>
+
+</html>

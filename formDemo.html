@@ -20,7 +20,7 @@
     </ul>
     <form action="" id='formOne'>
         <fieldset>
-            <input type="text" value="input value" id='textInput'>
+            <!-- <input type="text" value="input value" id='textInput'> -->
             <br>
             <input type="date" name="" id="">
         </fieldset>
@@ -47,6 +47,31 @@
             <br>
             <textarea name="" cols="30" rows="10" id='textareaDom'>initial value
             </textarea>
+        </fieldset>
+
+        <fieldset>
+            <h5>自动切换焦点演示</h5>
+            <input type="text" maxlength="10" value="initialinitialinitial" id='inputDom1'>
+            <br>
+            <br>
+            <input type="text" maxlength="10" value="initial" id='inputDom2'>
+            <br>
+            <br>
+            <input type="text" maxlength="10" value="initial" id='inputDom3'>
+        </fieldset>
+        <fieldset>
+            <h5>HTML5 验证 API</h5>
+            <label for="">text: </label>
+            <input type="text" maxlength="10" value='' name='text' id='textInput' required pattern='\d+'>
+            <input type="button" id='checkButton' value='validityCheck'>
+            <br>
+            <br>
+            <label for="email">email: </label>
+            <input type="email" name="email" id="email">
+            <br>
+            <br>
+            <label for="url">url: </label>
+            <input type="url" name="url" id="url">
         </fieldset>
     </form>
     <script>
@@ -113,13 +138,6 @@
 
             var $textareaDom = document.querySelector('#textareaDom');
 
-            $textareaDom.addEventListener('focus', function (e) {
-                this.setSelectionRange(0, 4);
-            });
-
-            $textareaDom.addEventListener('select', function (e) {
-            })
-
             var $inputDom = document.querySelector('#inputDom');
             $inputDom.addEventListener('keypress', function (e) {
                 var charCode = e.charCode;
@@ -129,6 +147,44 @@
                 }
             })
 
+            // 自动切换焦点事件
+            var autoSwitchFocus = function (e) {
+                var target = e.target;
+                var form = target.form;
+
+                var index = -1;
+                for (var i = 0; i < form.elements.length; i++) {
+                    if (form.elements[i] === target && target.value.length == target.maxLength) {
+                        index = i;
+                        continue;
+                    }
+                    if (index != -1 && form.elements[index + 1]) {
+                        form.elements[index + 1].focus();
+                    }
+                }
+            }
+
+            // 获得焦点后自动全部选中
+            var selectAll = function (e) {
+                var target = e.target;
+                target.select();
+            }
+
+            $formOne.addEventListener('keypress', autoSwitchFocus);
+
+            $formOne.addEventListener('compositionupdate', autoSwitchFocus);
+
+            // 此处注意，focus和blur不冒泡，所以使用事件委托的时候要选择捕获阶段
+            $formOne.addEventListener('focus', selectAll, true);
+
+            var $textInput = document.querySelector('#textInput');
+            var $checkButton = document.querySelector('#checkButton');
+            $checkButton.addEventListener('click', function (e) {
+                console.log($textInput.value + ' ' + $textInput.checkValidity());
+                if ($textInput.checkValidity()) {
+                    alert('success');
+                }
+            })
         })(window)
     </script>
 </body>
