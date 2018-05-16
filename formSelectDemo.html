@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Form Select Demo</title>
+</head>
+
+<body>
+    <h4>Form Select Demo</h4>
+    <form action="">
+        <select name="select" id="selectDom">
+            <option value="1">第一项</option>
+            <option value="2">第二项</option>
+            <option value="3">第三项</option>
+            <option>未指定value</option>
+        </select>
+    </form>
+    <script>
+        (function (window) {
+            var $selectDom = document.querySelector('#selectDom');
+
+            console.log('options.length: ' + $selectDom.options.length);
+            console.log('selectedIndex: ' + $selectDom.selectedIndex);
+            console.log('size: ' + $selectDom.size);
+            console.log('type: ' + $selectDom.type);
+            console.log('value: ' + $selectDom.value);
+
+            $selectDom.addEventListener('change', function (e) {
+                var selectedIndex = this.selectedIndex;
+                var selectedOption = this.options[selectedIndex];
+            })
+
+
+            //添加新option的三种方法
+
+            // 通过DOM添加option
+            function domAddOption() {
+                var $option = document.createElement('option');
+                $option.appendChild(document.createTextNode('append by dom'));
+                $option.setAttribute('value', 'Option value');
+
+                $selectDom.appendChild($option);
+            }
+            domAddOption();
+
+            // 通过构造函数option添加
+            function addByOption() {
+                var $option = new Option('option text', 'option value', false, true);
+
+                $selectDom.appendChild($option);
+            }
+            addByOption();
+
+            //通过select的add方法添加
+            function addBySelect() {
+                var $option = new Option('option text 2', 'option value 2', false, true);
+
+                $selectDom.add($option, undefined)
+            }
+            addBySelect();
+
+
+        })(window)
+    </script>
+</body>
+
+</html>
