@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Rich Text Demo</title>
+</head>
+
+<body>
+    <iframe name='richedit' src="" frameborder="1" style='width:500px;height:500px;'>
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <title>rich edit</title>
+        </head>
+
+        <body>
+            <p>walala</p>
+        </body>
+
+        </html>
+    </iframe>
+    <br>
+    <br>
+    <textarea name="" id="" cols="30" rows="10" contenteditable>
+
+    </textarea>
+    <script>
+        window.onload = function () {
+            window.frames['richedit'].document.designMode = 'on';
+            window.frames['richedit'].document.execCommand('backcolor', false, 'red');
+
+            console.log('backcolor is supported: ' + window.frames['richedit'].document.queryCommandEnabled('backcolor'));
+            console.log('fontcolor is supported: ' + window.frames['richedit'].document.queryCommandEnabled('fontcolor'));
+            console.log('fontsize is supported: ' + window.frames['richedit'].document.queryCommandEnabled('fontsize'));
+
+            // 对当前窗口中的文本编辑器的操纵
+            document.execCommand('backcolor', false, 'red');
+            document.execCommand('bold', false, null);
+        }
+    </script>
+</body>
+
+</html>

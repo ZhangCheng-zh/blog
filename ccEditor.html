@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CC Editor</title>
+</head>
+
+<body>
+    <h2>CC Editor Demo</h2>
+    <div id="cc-editor"></div>
+    <script>
+        (function (window) {
+            var $el = document.querySelector('#cc-editor');
+
+            class CCEditor {
+                constructor(configs = {}) {
+                    var defaultConfig = {
+                        width: '300',
+                        height: '300',
+                        borderWidth: '2',
+                        toolsbarConfig: {
+                            bold: {},
+                            italic: {},
+
+                        }
+                    }
+
+                    configs = Object.assign(defaultConfig, configs);
+
+                    this.init(configs);
+                }
+
+                // 按照配置初始化编辑器
+                init(configs) {
+                    if (!configs.el || configs.el.nodeType != 1) {
+                        return;
+                    }
+
+                    this.renderEditor(configs);
+
+                    this.renderToolsBar();
+                }
+
+                renderEditor(configs) {
+                    var el = configs.el;
+
+                    el.setAttribute('contentEditable', true);
+                    el.style.width = `${configs.width}px`;
+                    el.style.height = `${configs.height}px`;
+                    el.style.border = `${configs.borderWidth}px solid #333`;
+                }
+
+                // 按照配置给的工具栏初始化编辑器工具栏
+                renderToolsBar(toolsbarConfig = {}) {
+
+                }
+
+                // execCommand函数的封装
+                exec(command, value = null) {
+                    document.execCommand(command, false, value);
+                }
+
+
+
+            }
+
+            var $el = document.querySelector('#cc-editor');
+            var newCCEditor = new CCEditor({ el: $el });
+        })(window)
+    </script>
+</body>
+
+</html>
