@@ -10,23 +10,61 @@
 
 <body>
     <h4>Form Select Demo</h4>
-    <form action="">
+    <form action="" id='formOne'>
         <select name="select" id="selectDom">
+            <item value="1">第一项</option>
+                <option value="2">第二项</option>
+                <option value="3">第三项</option>
+                <option>未指定value</option>
+        </select>
+        <br>
+        <br>
+        <input type="button" value="button">
+        <br>
+        <br>
+        <input type="checkbox" name="checkbox" id="checkbox">
+        <br>
+        <br>
+        <input type="date" name="date" id="date">
+        <br>
+        <br>
+        <input type="email" name="email" id="email">
+        <br>
+        <br>
+        <input type="file" name="file" id="file">
+        <br>
+        <br>
+        <select name="select-multi" id="" multiple>
             <option value="1">第一项</option>
             <option value="2">第二项</option>
             <option value="3">第三项</option>
             <option>未指定value</option>
         </select>
+        <br>
+        <br>
+        <textarea name="textarea" id="textarea" cols="30" rows="10">textarea|textarea</textarea>
+        <br>
+        <br>
+        <input type="file" name="file" id="file">
+        <br>
+        <br>
+        <input type="submit" value="submit" id='submit'>
+        <br>
+        <br>
+        <input type="radio" name="radio" id="radio">
+
     </form>
     <script>
         (function (window) {
             var $selectDom = document.querySelector('#selectDom');
+            var $formOne = document.querySelector('#formOne');
 
             console.log('options.length: ' + $selectDom.options.length);
             console.log('selectedIndex: ' + $selectDom.selectedIndex);
             console.log('size: ' + $selectDom.size);
             console.log('type: ' + $selectDom.type);
             console.log('value: ' + $selectDom.value);
+
 
             $selectDom.addEventListener('change', function (e) {
                 var selectedIndex = this.selectedIndex;
@@ -62,6 +100,83 @@
             }
             addBySelect();
 
+            //移除第一个选项
+            function removeOption() {
+                $selectDom.options[0] = null;
+                // alert($selectDom.options[0].value);
+            }
+            removeOption();
+
+            //把最后一项移到第一项
+            function moveToTop() {
+                var $lastOption = $selectDom.options[$selectDom.options.length - 1];
+                $selectDom.insertBefore($lastOption, $selectDom.options[0]);
+            }
+            moveToTop();
+
+            // 表单序列化
+            function serialize(form) {
+
+                // 如果form不是object或者form没有elements属性，直接返回
+                if (typeof form != 'object' || !form.elements) {
+                    return;
+                }
+
+                var parts = [];
+                var item = null;
+                var option = {};
+                var optValue = '';
+
+                for (var i = 0; i < form.elements.length; i++) {
+                    item = form.elements[i];
+
+                    switch (item.type) {
+                        case 'select-one':
+                        case 'select-multiple':
+                            if (item.name.length) {
+                                for (var j = 0; j < item.options.length; j++) {
+                                    option = item.options[j];
+                                    optValue = '';
+                                    if (option.selected) {
+                                        optValue = option.hasAttribute('value') ? option.value : option.text;
+
+                                        parts.push(encodeURIComponent(item.name) + '=' +
+                                            encodeURIComponent(optValue));
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 'file':
+                        case 'submit':
+                        case 'reset':
+                        case undefined:
+                        case 'button':
+                            break;
+
+                        case 'radio':
+                        case 'checkbox':
+                            if (!item.checked) {
+                                break;
+                            }
+                        default:
+                            if (item.name.length) {
+                                parts.push(encodeURIComponent(item.name) + '=' +
+                                    encodeURIComponent(item.value));
+                            }
+                            break;
+                    }
+                }
+
+                return parts.join('&');
+            }
+
+            var $submit = document.querySelector('#submit');
+
+            $submit.addEventListener('click', function (e) {
+                e.preventDefault();
+                console.log(serialize($formOne));
+            })
 
         })(window)
     </script>
