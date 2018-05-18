@@ -1,0 +1,43 @@
+.CCEditor {
+    position: relative;
+    border: 2px solid #333;
+    font-size: 14px;
+}
+
+.CCEditor .cc-toolsbar {
+    /* position: absolute; */
+    display: block;
+    height: 20px;
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #333;
+    list-style: none;
+    cursor: pointer;
+    font-size:12px;
+    line-height: 20px;
+}
+
+.CCEditor .cc-toolsbar li {
+    display: inline-block;
+}
+
+.CCEditor .cc-toolsbar .active {
+    color: green;
+}
+
+.CCEditor .cc-toolsbar li:hover {
+    color: blue;
+}
+
+.CCEditor .cc-content {
+    position: absolute;
+    left:0;
+    right:0;
+    top: 21px;
+    bottom: 0;
+    padding: 5px;
+    outline: none;
+}
