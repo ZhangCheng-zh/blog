@@ -22,14 +22,13 @@
 
 .CCEditor .cc-toolsbar li {
     display: inline-block;
+    width: 20px;
+    text-align: center;
 }
 
 .CCEditor .cc-toolsbar .active {
-    color: green;
-}
-
-.CCEditor .cc-toolsbar li:hover {
-    color: blue;
+    color: #fff;
+    background:#aaa;
 }
 
 .CCEditor .cc-content {

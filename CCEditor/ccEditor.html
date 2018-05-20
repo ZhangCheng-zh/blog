@@ -17,6 +17,14 @@
         (function (window) {
             var $el = document.querySelector('#cc-editor');
 
+            function exec(command) {
+                console.log('before bold state: ' + document.queryCommandState('bold'));
+                var result = document.execCommand(command, false, null);
+                // debugger;
+                console.log('after bold state: ' + document.queryCommandState('bold'));
+                console.log('change result: ' + result);
+            }
+
             class CCEditor {
                 constructor(configs = {}) {
                     var defaultConfig = {
@@ -35,7 +43,7 @@
                                 icon: '<b>B<b>',
                                 title: 'bold',
                                 state: () => document.queryCommandState('bold'),
-                                handler: () => this.exec('bold')
+                                handler: () => exec('bold')
                             },
                             italic: {},
                             underline: {},
@@ -73,8 +81,6 @@
                     this.renderToolsBar(configs.toolsbarConfig);
 
                     this.output(configs);
-
-
                 }
 
                 renderEditor(configs) {
@@ -92,17 +98,17 @@
                     var $editorContent = document.createElement('div');
                     $editorContent.className = `${this.classesConfig.defaultContentClass}`;
 
-                    $editorContent.setAttribute('contentEditable', true);
+                    $editorContent.setAttribute('contenteditable', true);
 
                     this.el.appendChild($toolsBar);
                     this.$toolsBar = $toolsBar;
                     this.el.appendChild($editorContent);
                     this.$editorContent = $editorContent;
-
                 }
 
                 // 按照配置给的工具栏初始化编辑器工具栏
                 renderToolsBar(toolsbarConfig = {}) {
+                    var vm = this;
                     var $toolsBar = this.$toolsBar;
 
                     for (let key in toolsbarConfig) {
@@ -113,23 +119,27 @@
                         $li.innerHTML = item.icon || '';
 
                         $li.addEventListener('click', () => {
-                            item.handler();
+                            // item.handler();
+                            exec('bold');
+                            console.log(item.state());
                             item.state() ?
                                 this.addClass($li, 'active') :
                                 this.removeClass($li, 'active');
+
+                            vm.$editorContent.focus();
                         });
 
                         $toolsBar.appendChild($li);
-
                     }
                 }
 
                 // execCommand函数的封装
-                exec(command, value = null) {
-                    document.execCommand(command, false, value);
+                exec(command) {
+                    debugger;
+                    console.log('before bold state: ' + document.queryCommandState('bold'));
+                    document.execCommand(command, false, null);
+                    console.log('after bold state: ' + document.queryCommandState('bold'));
                 }
-
-
 
                 // 添加类名
                 addClass(targetDom, className) {
@@ -173,8 +183,6 @@
                         configs.output.innerHTML = vm.$editorContent.innerHTML;
                     })
                 }
-
-
 
             }
 
