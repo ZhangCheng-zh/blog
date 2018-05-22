@@ -1,4 +1,5 @@
-export class CCEditor {
+import style from '../style.css'
+class CCEditor {
     constructor(configs = {}) {
         var defaultConfig = {
             // 样式配置
@@ -111,6 +112,7 @@ export class CCEditor {
 
     renderEditor(configs) {
         this.el = configs.el;
+        this.el.classList.add(configs.classesConfig.defaultEditorClass);
 
         //添加工具栏
         var $toolsBar = document.createElement('ul');
@@ -243,7 +245,9 @@ export class CCEditor {
 
     // 取出编辑内容
     output() {
-        return vm.$editorContent.innerHTML;
+        return this.$editorContent.innerHTML;
     }
 
 }
+
+window.CCEditor = CCEditor;

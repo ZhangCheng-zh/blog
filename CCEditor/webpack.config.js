@@ -8,6 +8,17 @@ module.exports = function (env, argv) {
             filename: 'cceditor.bundle.js'
         },
         mode: env.production ? 'production' : 'development',
-        devtool: env.production ? 'source-maps' : 'eval'
+        devtool: env.production ? 'source-maps' : 'eval',
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: [
+                        { loader: "style-loader" },
+                        { loader: "css-loader" }
+                    ]
+                }
+            ]
+        }
     };
 };
