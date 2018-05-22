@@ -1,9 +1,6 @@
-class CCEditor {
+export class CCEditor {
     constructor(configs = {}) {
         var defaultConfig = {
-            width: '300',
-            height: '300',
-            borderWidth: '2',
             // 样式配置
             classesConfig: {
                 defaultEditorClass: 'CCEditor',
@@ -114,10 +111,6 @@ class CCEditor {
 
     renderEditor(configs) {
         this.el = configs.el;
-        // 添加编辑器样式
-        this.el.className += ` ${configs.classesConfig.defaultEditorClass}`;
-        this.el.style.width = `${configs.width}px`;
-        this.el.style.height = `${configs.height}px`;
 
         //添加工具栏
         var $toolsBar = document.createElement('ul');
