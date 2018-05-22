@@ -2,6 +2,8 @@
     position: relative;
     border: 2px solid #333;
     font-size: 14px;
+    min-width: 400px;
+    min-height: 300px;
 }
 
 .CCEditor .cc-toolsbar {
@@ -20,10 +22,16 @@
     line-height: 20px;
 }
 
-.CCEditor .cc-toolsbar li {
+.CCEditor .cc-toolsbar button {
     display: inline-block;
     width: 20px;
+    height: 100%;
     text-align: center;
+    border:none;
+    outline: none;
+    padding:0;
+    cursor: pointer;
+    background: transparent;
 }
 
 .CCEditor .cc-toolsbar .active {
