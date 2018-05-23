@@ -121,19 +121,18 @@ new CCEditor({
       name: 'custom',
       icon: 'C',
       title: 'Custom Action',
-      result: () => console.log('Do something!')
+      handler: () => console.log('Do something!')
     },
     underline:{}
   },
 
   // classes<Array[string]> (optional)
   // Choose your custom class names
-  classes: {
-    actionbar: 'pell-actionbar',
-    button: 'pell-button',
-    content: 'pell-content',
-    selected: 'pell-button-selected'
-  }
+  classesConfig: {
+      editorClass: 'CCEditor',
+      toolsbarClass: 'cc-toolsbar',
+      contentClass: 'cc-content'
+  },
 })
 ```
 
@@ -146,8 +145,8 @@ new CCEditor({
 - heading2
 - paragraph
 - quote
-- olist
-- ulist
+- orderlist
+- unorderlist
 - code
 - line
 - link
@@ -156,7 +155,8 @@ new CCEditor({
 #### Example
 
 ```html
-<div id="pell"></div>
+<script src='./dist/cceditor/bundle.js'></script>
+<div id="cc-editor"></div>
 <div>
   HTML output:
   <div id="html-output" style="white-space:pre-wrap;"></div>
@@ -164,98 +164,59 @@ new CCEditor({
 ```
 
 ```js
-import { exec, init } from 'pell'
 
-const editor = init({
+const editor = new CCEditor({
   element: document.getElementById('pell'),
   onChange: html => {
     document.getElementById('html-output').textContent = html
   },
-  defaultParagraphSeparator: 'p',
-  styleWithCSS: true,
-  actions: [
-    'bold',
-    'underline',
-    {
-      name: 'italic',
-      result: () => exec('italic')
-    },
-    {
+  actions: {
+    custom: {
       name: 'custom',
       icon: '<b><u><i>C</i></u></b>',
       title: 'Custom Action',
       result: () => console.log('YOLO')
     },
-    {
-      name: 'image',
-      result: () => {
-        const url = window.prompt('Enter the image URL')
-        if (url) exec('insertImage', url)
-      }
-    },
-    {
-      name: 'link',
-      result: () => {
-        const url = window.prompt('Enter the link URL')
-        if (url) exec('createLink', url)
-      }
-    }
-  ],
-  classes: {
-    actionbar: 'pell-actionbar-custom-name',
-    button: 'pell-button-custom-name',
-    content: 'pell-content-custom-name',
-    selected: 'pell-button-selected-custom-name'
-  }
+  },
 })
 
-// editor.content<HTMLElement>
-// To change the editor's content:
-editor.content.innerHTML = '<b><u><i>Initial content!</i></u></b>'
 ```
 
-#### Example (Markdown)
+#### Example 
 
 ```html
-<div id="pell"></div>
+<h2>CC Editor Demo</h2>
+<div id="cc-editor" style='width: 400px; height: 400px; border-width: 1px;'></div>
 <div>
-  Markdown output:
-  <div id="markdown-output" style="white-space:pre-wrap;"></div>
+    Output:
+    <div id="output"></div>
 </div>
 ```
 
 ```js
-import { init } from 'pell'
-import Turndown from 'turndown'
-
-const { turndown } = new Turndown({ headingStyle: 'atx' })
-
-init({
-  element: document.getElementById('pell'),
-  actions: ['bold', 'italic', 'heading1', 'heading2', 'olist', 'ulist'],
-  onChange: html => {
-    document.getElementById('markdown-output').innerHTML = turndown(html)
-  }
-})
+(function (window) {
+    var $el = document.querySelector('#cc-editor');
+    var newCCEditor = new CCEditor({
+        el: $el,
+        onChange: (html) => {
+            document.querySelector('#output').innerHTML = html;
+        }
+    });
+})(window)
 ```
 
 ## Custom Styles
 
-#### SCSS
-
-```scss
-$pell-content-height: 400px;
-// See all overwriteable variables in src/pell.scss
-
-// Then import pell.scss into styles:
-@import '../../node_modules/pell/src/pell';
-```
-
 #### CSS
 
 ```css
-/* After pell styles are applied to DOM: */
-.pell-content {
+.CCEditor {
+  width: 400px; 
+  height: 400px; 
+  border-width: 1px;
+}
+
+.CCEditor .cc-content {
   height: 400px;
 }
 ```

@@ -4,9 +4,9 @@ class CCEditor {
         var defaultConfig = {
             // 样式配置
             classesConfig: {
-                defaultEditorClass: 'CCEditor',
-                defaultToolsbarClass: 'cc-toolsbar',
-                defaultContentClass: 'cc-content'
+                editorClass: 'CCEditor',
+                toolsbarClass: 'cc-toolsbar',
+                contentClass: 'cc-content'
             },
             // 动作条配置项
             toolsbarConfig: {
@@ -95,11 +95,11 @@ class CCEditor {
             onChange: (html) => console.log(html)
         }
 
-        configs = Object.assign(defaultConfig, configs);
+        this.configs = Object.assign(defaultConfig, configs);
 
-        this.classesConfig = configs.classesConfig;
+        this.classesConfig = this.configs.classesConfig;
 
-        this.init(configs);
+        this.init(this.configs);
     }
 
     // 按照配置初始化编辑器
@@ -113,15 +113,15 @@ class CCEditor {
 
     renderEditor(configs) {
         this.el = configs.el;
-        this.el.classList.add(configs.classesConfig.defaultEditorClass);
+        this.el.classList.add(configs.classesConfig.editorClass);
 
         //添加工具栏
         var $toolsBar = document.createElement('ul');
-        $toolsBar.className += ` ${this.classesConfig.defaultToolsbarClass}`;
+        $toolsBar.className += ` ${this.classesConfig.toolsbarClass}`;
 
         // 添加编辑区
         var $editorContent = document.createElement('div');
-        $editorContent.className = `${this.classesConfig.defaultContentClass}`;
+        $editorContent.className = `${this.classesConfig.contentClass}`;
 
         $editorContent.contentEditable = true;
 
@@ -189,7 +189,7 @@ class CCEditor {
                 vm.$editorContent.innerHTML = content.replace('<div><br></div>', '<p><br></p>')
             }
 
-            this.configs.onChange(this.$editorContent.innerHTML);
+            vm.configs.onChange(vm.$editorContent.innerHTML);
         }
 
         this.addEventListener(this.$editorContent, 'input', handler);
@@ -205,9 +205,7 @@ class CCEditor {
 
     // execCommand函数的封装
     exec(command, value = null) {
-        console.log('In exec: ' + document.queryCommandState(command));
         document.execCommand(command, false, value);
-        console.log('In exec: ' + document.queryCommandState(command));
     }
 
     // 添加类名
