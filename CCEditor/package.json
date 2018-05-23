@@ -1,6 +1,6 @@
 {
   "name": "cceditor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CC editor is a simple small extensible mobile-friendly WYSIWYG text editor for web, with no dependencies",
   "main": "index.js",
   "scripts": {
