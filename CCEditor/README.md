@@ -46,7 +46,7 @@ Or create any custom action!
 
 ## Browser Support
 
-* IE 9+ (theoretically, but good luck)
+* IE 9+
 * Chrome 5+
 * Firefox 4+
 * Safari 5+
@@ -100,21 +100,14 @@ window.pell
 
 ```js
 // Initialize pell on an HTMLElement
-pell.init({
+new CCEditor({
   // <HTMLElement>, required
   element: document.getElementById('some-id'),
 
-  // <Function>, required
-  // Use the output html, triggered by element's `oninput` event
+  // <Function>, optional 默认为
+  // (html) => console.log(html)
   onChange: html => console.log(html),
 
-  // <string>, optional, default = 'div'
-  // Instructs the editor which element to inject via the return key
-  defaultParagraphSeparator: 'div',
-
-  // <boolean>, optional, default = false
-  // Outputs <span style="font-weight: bold;"></span> instead of <b></b>
-  styleWithCSS: false,
 
   // <Array[string | Object]>, string if overwriting, object if customizing/creating
   // action.name<string> (only required if overwriting)
@@ -122,16 +115,16 @@ pell.init({
   // action.title<string> (optional)
   // action.result<Function> (required)
   // Specify the actions you specifically want (in order)
-  actions: [
-    'bold',
-    {
+  actions: {
+    bold: {},
+    custom: {
       name: 'custom',
       icon: 'C',
       title: 'Custom Action',
       result: () => console.log('Do something!')
     },
-    'underline'
-  ],
+    underline:{}
+  },
 
   // classes<Array[string]> (optional)
   // Choose your custom class names
@@ -142,11 +135,6 @@ pell.init({
     selected: 'pell-button-selected'
   }
 })
-
-// Execute a document command, see reference:
-// https://developer.mozilla.org/en/docs/Web/API/Document/execCommand
-// this is just `document.execCommand(command, false, value)`
-pell.exec(command<string>, value<string>)
 ```
 
 #### List of overwriteable action names

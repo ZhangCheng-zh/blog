@@ -90,7 +90,9 @@ class CCEditor {
                         this.exec('insertImage', image);
                     }
                 }
-            }
+            },
+            // 默认的输出方式，由content的oninput事件触发
+            onChange: (html) => console.log(html)
         }
 
         configs = Object.assign(defaultConfig, configs);
@@ -107,7 +109,6 @@ class CCEditor {
         }
 
         this.renderEditor(configs);
-        this.output(configs);
     }
 
     renderEditor(configs) {
@@ -187,6 +188,8 @@ class CCEditor {
             if (e.key == 'Enter') {
                 vm.$editorContent.innerHTML = content.replace('<div><br></div>', '<p><br></p>')
             }
+
+            this.configs.onChange(this.$editorContent.innerHTML);
         }
 
         this.addEventListener(this.$editorContent, 'input', handler);
@@ -242,12 +245,6 @@ class CCEditor {
             targetDom.addEventListener(...args);
         }
     }
-
-    // 取出编辑内容
-    output() {
-        return this.$editorContent.innerHTML;
-    }
-
 }
 
 window.CCEditor = CCEditor;
