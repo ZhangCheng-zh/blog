@@ -5,7 +5,7 @@ module.exports = function (env, argv) {
         entry: './src/js/cceditor.js',
         output: {
             path: path.resolve(__dirname, 'dist'),
-            filename: 'cceditor.bundle.js'
+            filename: 'cceditor.min.js'
         },
         mode: env.production ? 'production' : 'development',
         devtool: env.production ? 'source-maps' : 'eval',

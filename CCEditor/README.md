@@ -57,27 +57,7 @@ Or create any custom action!
 #### npm:
 
 ```bash
-npm install --save pell
-```
-
-#### HTML:
-
-```html
-<head>
-  ...
-  <link rel="stylesheet" type="text/css" href="https://unpkg.com/pell/dist/pell.min.css">
-  <style>
-    /* override styles here */
-    .pell-content {
-      background-color: pink;
-    }
-  </style>
-</head>
-<body>
-  ...
-  <!-- Bottom of body -->
-  <script src="https://unpkg.com/pell"></script>
-</body>
+npm install --save cceditor
 ```
 
 ## Usage
@@ -85,21 +65,7 @@ npm install --save pell
 #### API
 
 ```js
-// ES6
-import pell from 'pell'
-// or
-import { exec, init } from 'pell'
-```
-
-```js
-// Browser
-pell
-// or
-window.pell
-```
-
-```js
-// Initialize pell on an HTMLElement
+// Initialize CCEditor on an HTMLElement
 new CCEditor({
   // <HTMLElement>, required
   element: document.getElementById('some-id'),
