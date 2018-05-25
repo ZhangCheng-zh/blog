@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Function</title>
+</head>
+
+<body>
+    <script type='module'>
+        //原型模式
+
+        function ChineseMan(age, name, job) {
+            this.language = 'Chinese';
+            this.age = age;
+            this.name = name;
+            this.job = job;
+            this.sayAge = function () {
+                alert(this.age);
+            }
+        }
+
+        ChineseMan.prototype.sayName = function () {
+            alert(this.name);
+        }
+
+        let xiaoMing = new ChineseMan(21, 'XiaoMing', 'EE');
+
+        let xiaoHei = new ChineseMan(20, 'XiaoHei', 'artist');
+
+        console.log(xiaoMing.constructor === xiaoHei.constructor);
+        console.log(xiaoMing.sayName === xiaoHei.sayName);
+        console.log(xiaoMing.sayAge === xiaoHei.sayAge);
+        console.log(xiaoMing.sayName === ChineseMan.prototype.sayName);
+
+        // 实例与构造函数没有直接关系
+        console.log(ChineseMan.prototype.isPrototypeOf(xiaoMing));
+        console.log(ChineseMan.prototype.isPrototypeOf(xiaoHei));
+        console.log(Object.getPrototypeOf(xiaoHei));
+        console.log(Object.getPrototypeOf(xiaoMing));
+    </script>
+</body>
+
+</html>
