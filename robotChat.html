@@ -13,11 +13,9 @@
     <div id="chat-room">
 
     </div>
-    <iframe src="" frameborder="1" id='hanMeiMei'>
-
+    <iframe frameborder="1" id='hanMeiMei'>
     </iframe>
-    <iframe src="" frameborder="1" id='liLei'>
-
+    <iframe frameborder="1" id='liLei'>
     </iframe>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
@@ -36,11 +34,14 @@
         const $two = document.querySelector('#liLei');
 
         class Person {
-            constructor() { }
+            constructor(user) {
+                this.user = user || {};
+            }
             listen(content) {
 
             }
             speak() { }
+            showResponse() { }
         }
 
         function postMessage(message, user) {
@@ -114,7 +115,7 @@
                 .catch(errorHandler);
         }
 
-        keepChat('你好', liLei);
+        // keepChat('你好', liLei);
 
 
     </script>
