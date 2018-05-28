@@ -29,13 +29,17 @@
             userId: '269283'
         }
 
-        const $one = document.querySelector('#hanMeiMei');
-
-        const $two = document.querySelector('#liLei');
+        const windowOne = window.frames[0].window;
+        const windowTwo = window.frames[1].window;
 
         class Person {
-            constructor(user) {
-                this.user = user || {};
+            constructor(config) {
+                this.config = config || {};
+                this.user = config.user || {};
+                this.init();
+            }
+            init() {
+
             }
             listen(content) {
 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTML5 Event</title>
+</head>
+
+<body>
+    <script type='module'>
+            import { notifyMe } from './js/notify.js';
+    
+            window.addEventListener('readystatechange', function (e) {
+                debugger;
+                if(document.readyState == 'interactive') {
+                    notifyMe('Content loaded');
+                }
+            });
+    </script>
+    <h2>HTML5 Event Demo</h2>
+    <input type="button" value="Insert DOM" id="insert">
+    <input type="button" value="Remove DOM" id="remove">
+    <input type="button" value="Change Inner Text" id="change">
+    <ul id='dom-container'>
+        <li>子段落</li>
+        <li>子段落</li>
+        <li>子段落</li>
+        <li>子段落</li>
+    </ul>
+    <div id="myMenu">我的自定义菜单</div>
+
+    <style>
+        #myMenu {
+            position: fixed;
+            visibility: hidden;
+        }
+    </style>
+</body>
+
+</html>
