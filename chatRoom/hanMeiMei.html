@@ -9,29 +9,27 @@
 </head>
 
 <body>
-    <h3>我是LiLei：</h3>
-    <iframe src="" frameborder="0" id='LiLei'></iframe>
+    <h3>我是HanMeimei：</h3>
+    <iframe src="" frameborder="0" id='hanMeimei'></iframe>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type='module'>
         import { Person } from './chatRobot.js';
 
-        const LiLeiUser = {
-            name: 'LiLei',
+        const HanMeimeiUser = {
+            name: 'HanMeimei',
             apiKey: '270df8654294443a926935587cf571d7',
             userId: '269283'
         }
 
-        const LiLeiConfig = {
-            frame: document.querySelector('#LiLei'),
-            user: LiLeiUser
+        const HanMeimeiConfig = {
+            frame: document.querySelector('#hanMeimei'),
+            user: HanMeimeiUser
         }
 
-        let LiLei = new Person(LiLeiConfig);
+        let HanMeimei = new Person(HanMeimeiConfig);
 
-        LiLei.replySpeed(2000);
-        LiLei.communicateByBroadcastChannel('HanMeimei');
-        window.LiLei = LiLei;
-        LiLei.sendMessageByBroadcastChannel('在吗？');
+        HanMeimei.replySpeed(2000);
+        HanMeimei.communicateByBroadcastChannel('LiLei')
     </script>
 </body>
 
