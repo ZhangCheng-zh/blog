@@ -42,6 +42,7 @@
             frame: $one,
             user: liLei
         }
+
         /**
          * ? to do
          * 
@@ -58,7 +59,8 @@
 
                 this.document = this.frame.contentDocument;
 
-
+                this.replyTarget = null;
+                this.replyInterval = 1000;
 
                 // 添加接受消息的input
                 var messageInput = document.createElement('input');
@@ -70,45 +72,67 @@
                 let vm = this;
                 this.updateReceivedMessageEvent = new Event('update');
 
+                // 添加监听window message变化
+                this.showReplyByPostMessage();
+
                 messageInput.addEventListener('update', (e) => {
                     vm.receivedMessage = e.target.value;
 
-                    debugger;
+                    
 
                     vm.think()
+                        .then(sleep(this.replyInterval))
                         .then(successHandler)
                         .then(filterResult)
                         .then(vm.reply.bind(vm))
-                        .then(vm.show)
+                        .then(vm.sayByPostMessage.bind(vm))
                         .catch(errorHandler);
                 });
 
                 this.document.body.appendChild(messageInput);
             }
-            sendReply(targetPerson) {
-                let vm = this;
-                if (targetPerson instanceof Person) {
-                    targetPerson.receiveMessage(vm.replyList[vm.replyList.length - 1]);
-                }
-            }
             reply(responseText) {
+
                 this.replyList.push(responseText);
+                if (this.replyTarget instanceof Person) {
+                    this.sayTo(this.replyTarget, responseText);
+                }
+                
                 return responseText;
             }
 
             think() {
-                debugger;
                 return postMessage(this.receivedMessage, this.config.user)
             }
 
-            show(responseText) {
-                console.log(responseText);
+            sayByPostMessage(responseText) {
+                this.frame.contentWindow.postMessage(responseText, location.origin);
+            }
+
+            showReplyByPostMessage() {
+                this.frame.contentWindow.onmessage = (evt) => console.log(evt);   
             }
 
             receiveMessage(text) {
                 this.$receivedMessageContainer.value = text;
                 this.$receivedMessageContainer.dispatchEvent(this.updateReceivedMessageEvent);
-                debugger;
+            }
+
+            sayTo (person, message) {
+                let vm = this;
+                if (person instanceof Person) {
+                    person.receiveMessage(message);
+                    person.replyTarget = vm;
+                }
+            }
+
+            replySpeed (timeInterval) {
+                if (typeof timeInterval === 'number' && timeInterval > 1000) {
+                    this.replyInterval = timeInterval || 1000;
+                } else {
+                    this.replyInterval = 1000;
+                }
+                
             }
         }
 
@@ -138,8 +162,17 @@
                     "userId": user.userId
                 }
             }
-            debugger;
+            
             return axios.post(url, defaultData);
+        }
+
+        function sleep(ms) {
+            return function (value) {
+                return new Promise((resolve) => {
+                    setTimeout(() => resolve(value), ms);
+                })
+               
+            }
         }
 
         function errorHandler(error) {
@@ -161,19 +194,15 @@
             for (let item of result) {
                 text += item.values.text;
             }
-            debugger;
+            
             return text;
         }
 
         var liLeiOne = new Person(liLeiOneConfig);
         var liLeiTwo = new Person(liLeiTwoConfig);
 
-
-        liLeiOne.receiveMessage('你好');
-
-        liLeiOne.sendReply(liLeiTwo);
-
-        liLeiTwo.sendReply(liLeiOne);
+        liLeiOne.replySpeed(2000);
+        liLeiOne.sayTo(liLeiTwo, '你好')
 
     </script>
 </body>
