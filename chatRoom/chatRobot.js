@@ -23,12 +23,30 @@ export class Person {
         this.selfBroadcastChannel = new BroadcastChannel(this.config.user.name);
 
         // 给接受message的变量绑定监听更新的事件
-        this.receivedMessageUpdateEvent = new Event('updateMessage', { "bubbles": false, "cancelable": true });
+        this.receivedMessageContainerAddEvent();
+
+
+        let vm = this;
+
+        // 关闭页面时销毁相关事件
+        window.onunload = () => {
+            vm.destory();
+        }
+    }
+
+    destory () {
+        this.selfBroadcastChannel.close();
+    }
+
+    receivedMessageContainerAddEvent () {
+        let vm = this;
+        
+        vm.receivedMessageUpdateEvent = new Event('updateMessage', { "bubbles": false, "cancelable": true });
 
         let updateHandler = function (e) {
             debugger;
-            return this.think()
-                .then(sleep(this.replyInterval))
+            return vm.think()
+                .then(sleep(vm.replyInterval))
                 .then(successHandler)
                 .then(filterResult)
                 .then(vm.reply)
@@ -36,8 +54,7 @@ export class Person {
                 .catch(errorHandler);
         }
 
-        let vm = this;
-        this.$receivedMessage.addEventListener('updateMessage', updateHandler.bind(vm));
+        vm.$receivedMessage.addEventListener('updateMessage', updateHandler.bind(vm));
     }
 
     reply(responseText) {
@@ -45,6 +62,7 @@ export class Person {
 
         if (this.replyTarget instanceof Person) {
             this.sayTo(this.replyTarget, responseText);
+            debugger;
         }
 
         return responseText;
@@ -187,8 +205,6 @@ function successHandler(res) {
 function filterResult(res) {
     let result = res.results;
     let text = '';
-
-    debugger;
 
     for (let item of result) {
         text += item.values.text;
