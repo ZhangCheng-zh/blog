@@ -10,7 +10,12 @@
 
 <body>
     <h3>我是LiLei：</h3>
-    <iframe src="" frameborder="0" id='LiLei'></iframe>
+    <form action="">
+        <label>
+            是否回复：
+            <input type="checkbox" name="replyStatus" id="replyStatusButton" checked>
+        </label>
+    </form>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type='module'>
         import { Person } from './chatRobot.js';
@@ -22,16 +27,23 @@
         }
 
         const LiLeiConfig = {
-            frame: document.querySelector('#LiLei'),
+            replyButton: document.querySelector('#replyStatusButton'),
             user: LiLeiUser
         }
 
         let LiLei = new Person(LiLeiConfig);
 
         LiLei.replySpeed(5000);
-        LiLei.communicateByBroadcastChannel('HanMeimei');
+
+        LiLei.receiveMessageByBroadcastChannel('HanMeimei');
+        // liLei.communicateByLocalStorage('HanMeimei');
+
         window.LiLei = LiLei;
-        LiLei.sendMessageByBroadcastChannel('在吗？');
+        try {
+            LiLei.sendMessageByBroadcastChannel('在吗？');
+        } catch (e) {
+            console.log(e);
+        }
     </script>
 </body>
 

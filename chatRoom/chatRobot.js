@@ -1,32 +1,52 @@
 export class Person {
     constructor(config) {
+        let vm = this;
+
         this.config = config || {};
         this.replyList = [];
+
+
+        this.latestReply = ''
         // 回复的对象
         this.replyTarget = null;
 
         // 回复的时间间隔
         this.replyInterval = 1000;
 
+        this.customEvent = this.initCustomEvent('update');
+
         // 接受消息的属性
         this.$receivedMessage = document.createElement('input');
         this.$receivedMessage.type = 'text';
         this.$receivedMessage.value = '';
+        this.$receivedMessage.addEventListener('update', this.receivedMessageUpdateHandler.bind(this));
 
-        // 初始化对话控制状态
-        this.status = {
-            silent: false,
-            stop: false,
-        }
+        // 装载回复消息的容器
+        this.$replyMessage = document.createElement('input');
+        this.$replyMessage.type = 'text';
+        this.$replyMessage.value = '';
+        this.$replyMessage.addEventListener('update', this.replyMessageUpdateHandler.bind(this));
+
+        this.hasReplied = false;
+
+        // 默认回复方法
+        this.method = 'broadcastChannel';
+
+
 
         // 创建一个自己的专属channel
         this.selfBroadcastChannel = new BroadcastChannel(this.config.user.name);
 
-        // 给接受message的变量绑定监听更新的事件
-        this.receivedMessageContainerAddEvent();
+        // 初始化对话控制状态
+        this.replyStatus = true;
 
-
-        let vm = this;
+        // 初始化是否回复按钮
+        if (this.config.replyButton && this.config.replyButton.nodeType === 1) {
+            this.config.replyButton.addEventListener('change', (e) => {
+                // debugger;
+                vm.changeReplyStatus(e.target.checked);
+            })
+        }
 
         // 关闭页面时销毁相关事件
         window.onunload = () => {
@@ -34,53 +54,66 @@ export class Person {
         }
     }
 
-    destory () {
+    initCustomEvent(customEventName) {
+        return new Event(customEventName);
+    }
+
+    receivedMessageUpdateHandler(e) {
+        let vm = this;
+        if (this.replyStatus) {
+            this.think()
+                .then(sleep(vm.replyInterval))
+                .then(successHandler)
+                .then(filterResult)
+                .then(vm.confirmReplyMessage.bind(vm))
+                .catch(errorHandler)
+        } else {
+            console.log('思考回复消息失败')
+        }
+    }
+
+    // 回复语句更新后的处理方法
+    replyMessageUpdateHandler(e) {
+        if (this.method === 'localStorage') {
+            this.sendMessageByLocalStorage();
+        } else if (this.method === 'broadcastChannel') {
+            // 通过BroadcastChannel传递消息
+            this.sendMessageByBroadcastChannel();
+        }
+    }
+
+    confirmReplyMessage(message) {
+        this.replyMessageUpdate(message);
+    }
+
+    destory() {
         this.selfBroadcastChannel.close();
     }
 
-    receivedMessageContainerAddEvent () {
+    handleReceivedMessage() {
         let vm = this;
-        
-        vm.receivedMessageUpdateEvent = new Event('updateMessage', { "bubbles": false, "cancelable": true });
 
-        let updateHandler = function (e) {
-            debugger;
+        if (vm.replyStatus) {
+            // 回复完成，重置是否回复过的状态
+            vm.hasReplied = false;
+
             return vm.think()
                 .then(sleep(vm.replyInterval))
                 .then(successHandler)
                 .then(filterResult)
-                .then(vm.reply)
-                .then(vm.sendMessageByBroadcastChannel)
-                .catch(errorHandler);
+        } else {
+            console.log('Have already stop reply');
         }
 
-        vm.$receivedMessage.addEventListener('updateMessage', updateHandler.bind(vm));
-    }
-
-    reply(responseText) {
-        this.replyList.push(responseText);
-
-        if (this.replyTarget instanceof Person) {
-            this.sayTo(this.replyTarget, responseText);
-            debugger;
-        }
-
-        return responseText;
     }
 
     think() {
         return postMessage(this.$receivedMessage.value, this.config.user)
     }
 
-    sayByPostMessage(responseText) {
-        this.replyTarget.postMessage(responseText, location.origin);
-    }
-
-    showReplyByPostMessage() {
-        this.replyTarget.onmessage = (evt) => console.log(evt);
-    }
-
-    sendMessageByBroadcastChannel(message) {
+    // 使用BroadcastChannel发送消息
+    sendMessageByBroadcastChannel() {
+        let message = this.$replyMessage.value;
         if (typeof message === 'string') {
             console.log('send message: ' + message);
             this.selfBroadcastChannel.postMessage(message);
@@ -89,36 +122,74 @@ export class Person {
         }
     }
 
-    communicateByBroadcastChannel(targetPersonName) {
+    // 使用BroadcastChannel接收消息
+    receiveMessageByBroadcastChannel(targetPersonName) {
         let vm = this;
-        if (targetPersonName) {
+
+        if (typeof targetPersonName === 'string' && targetPersonName.length) {
             let listeningChannel = new BroadcastChannel(targetPersonName);
-            listeningChannel.onmessage = (e) => vm.receiveMessage(e.data)
+            listeningChannel.onmessage = (e) => {
+                vm.receivedMessageUpdate.bind(vm);
+            }
         }
     }
 
-    receiveMessage(text) {
+
+    // 建立localStorage通信机制
+    communicateByLocalStorage(targetPersonName) {
         let vm = this;
 
-        vm.$receivedMessage.value = text;
-        console.log('received message: ' + text);
-
-        vm.$receivedMessage.dispatchEvent(vm.receivedMessageUpdateEvent);
-    }
-
-    toggleTalk() {
-        this.status.stop = !(this.status.stop);
-
-        if (this.status.stop) {
-
+        if (typeof targetPersonName === 'string' && targetPersonName.length) {
+            vm.initLocalStorageCommunication(targetPersonName);
         }
     }
 
-    sayTo(person, message) {
+    // 初始化localStorage的通信通道
+    initLocalStorageCommunication(targetPersonName) {
         let vm = this;
-        if (person instanceof Person) {
-            person.receiveMessage(message);
-            person.replyTarget = vm;
+
+        window.localStorage.setItem(`${this.config.user.name}To${targetPersonName}`, '');
+        window.localStorage.setItem(`${targetPersonName}To${this.config.user.name}`, '');
+
+        vm.localStorageKey = [`${this.config.user.name}To${targetPersonName}`
+            , `${targetPersonName}To${this.config.user.name}`];
+
+
+    }
+
+    // 将消息通过localStorage送出去
+    sendMessageByLocalStorage(message) {
+        window.localStorage.setItem(`${this.config.user.name}To${targetPersonName}`, message);
+    }
+
+    // 接受通过localStorage传回来的消息
+    receiveMessageByLocalStorage(message) {
+        window.onstorage = e => {
+            // 监听接收消息的storageItem是否有变动
+            if (e.key === vm.localStorageKey[1]) {
+                vm.receivedMessageUpdate();
+            }
+        }
+    }
+
+    receivedMessageUpdate(value) {
+        this.$receivedMessage.value = value;
+        this.$receivedMessage.dispatchEvent(this.customEvent);
+    }
+
+    replyMessageUpdate(value) {
+        this.$replyMessage.value = value;
+        this.$replyMessage.dispatchEvent(this.customEvent);
+    }
+
+    // 控制是否回复
+    changeReplyStatus(status) {
+        if (typeof status === 'boolean') {
+            this.replyStatus = status;
+            console.log('调整回复状态为：' + this.replyStatus);
+            if (this.replyStatus) {
+                this.handleReceivedMessage();
+            }
         }
     }
 
@@ -131,24 +202,15 @@ export class Person {
     }
 
     // 开始一个话题
-    beginTalk(startMessage) {
+    beginTalk(startMessage, method) {
         if (typeof startMessage === 'string' && startMessage.length) {
-            this.sendMessageByBroadcastChannel(startMessage);
+            if (method == 'localStorage') {
+
+            }
         } else {
             throw new Error('Start message not match rules.');
         }
     }
-
-    // 终止一次对话
-    finishTalk() {
-
-    }
-
-    // 暂停当前对话
-    stopTalk() { }
-
-    // 恢复当前对话
-    resumeTalk() { }
 }
 
 function postMessage(message, user) {
