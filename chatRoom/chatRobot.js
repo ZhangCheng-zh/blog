@@ -42,10 +42,11 @@ export class Person {
 
         // 初始化是否回复按钮
         if (this.config.replyButton && this.config.replyButton.nodeType === 1) {
-            this.config.replyButton.addEventListener('change', (e) => {
-                // debugger;
-                vm.changeReplyStatus(e.target.checked);
-            })
+            let replyButtonHandler = function (e) {
+                this.changeReplyStatus(e.target.checked);
+            }
+
+            this.config.replyButton.addEventListener('change', replyButtonHandler.bind(vm))
         }
 
         // 关闭页面时销毁相关事件
@@ -60,13 +61,13 @@ export class Person {
 
     receivedMessageUpdateHandler(e) {
         let vm = this;
-        if (this.replyStatus) {
-            this.think()
+        if (vm.replyStatus) {
+            vm.think()
                 .then(sleep(vm.replyInterval))
                 .then(successHandler)
                 .then(filterResult)
                 .then(vm.confirmReplyMessage.bind(vm))
-                .catch(errorHandler)
+                .catch(errorHandler);
         } else {
             console.log('思考回复消息失败')
         }
@@ -74,12 +75,14 @@ export class Person {
 
     // 回复语句更新后的处理方法
     replyMessageUpdateHandler(e) {
+        console.log('send message: ' + this.$replyMessage.value);
         if (this.method === 'localStorage') {
-            this.sendMessageByLocalStorage();
+            window.localStorage[this.localStorageKey[0]] = this.$replyMessage.value;
         } else if (this.method === 'broadcastChannel') {
             // 通过BroadcastChannel传递消息
             this.sendMessageByBroadcastChannel();
         }
+
     }
 
     confirmReplyMessage(message) {
@@ -115,7 +118,6 @@ export class Person {
     sendMessageByBroadcastChannel() {
         let message = this.$replyMessage.value;
         if (typeof message === 'string') {
-            console.log('send message: ' + message);
             this.selfBroadcastChannel.postMessage(message);
         } else {
             throw new Error('message not exist');
@@ -124,12 +126,14 @@ export class Person {
 
     // 使用BroadcastChannel接收消息
     receiveMessageByBroadcastChannel(targetPersonName) {
+
         let vm = this;
 
         if (typeof targetPersonName === 'string' && targetPersonName.length) {
             let listeningChannel = new BroadcastChannel(targetPersonName);
             listeningChannel.onmessage = (e) => {
-                vm.receivedMessageUpdate.bind(vm);
+                vm.receivedMessageUpdate(e.data);
+
             }
         }
     }
@@ -140,40 +144,39 @@ export class Person {
         let vm = this;
 
         if (typeof targetPersonName === 'string' && targetPersonName.length) {
-            vm.initLocalStorageCommunication(targetPersonName);
+            window.localStorage.setItem(`${this.config.user.name}To${targetPersonName}`, '');
+            window.localStorage.setItem(`${targetPersonName}To${this.config.user.name}`, '');
+
+            vm.localStorageKey = [`${this.config.user.name}To${targetPersonName}`
+                , `${targetPersonName}To${this.config.user.name}`];
+
+            vm.receiveMessageByLocalStorage();
+
         }
     }
 
-    // 初始化localStorage的通信通道
-    initLocalStorageCommunication(targetPersonName) {
-        let vm = this;
-
-        window.localStorage.setItem(`${this.config.user.name}To${targetPersonName}`, '');
-        window.localStorage.setItem(`${targetPersonName}To${this.config.user.name}`, '');
-
-        vm.localStorageKey = [`${this.config.user.name}To${targetPersonName}`
-            , `${targetPersonName}To${this.config.user.name}`];
-
-
-    }
 
     // 将消息通过localStorage送出去
-    sendMessageByLocalStorage(message) {
-        window.localStorage.setItem(`${this.config.user.name}To${targetPersonName}`, message);
+    sendMessageByLocalStorage() {
+        window.localStorage.setItem(`${this.config.user.name}To${this.targetPersonName}`, this.$receivedMessage.value);
     }
 
     // 接受通过localStorage传回来的消息
-    receiveMessageByLocalStorage(message) {
-        window.onstorage = e => {
+    receiveMessageByLocalStorage() {
+        let receiveMessageHandler = function (e) {
             // 监听接收消息的storageItem是否有变动
-            if (e.key === vm.localStorageKey[1]) {
-                vm.receivedMessageUpdate();
+            if (e.key === this.localStorageKey[1]) {
+                this.receivedMessageUpdate(window.localStorage[this.localStorageKey[1]]);
+
             }
         }
+
+        window.onstorage = receiveMessageHandler.bind(this);
     }
 
     receivedMessageUpdate(value) {
         this.$receivedMessage.value = value;
+        console.log('received message: ' + value);
         this.$receivedMessage.dispatchEvent(this.customEvent);
     }
 
@@ -202,13 +205,26 @@ export class Person {
     }
 
     // 开始一个话题
-    beginTalk(startMessage, method) {
+    beginTalk(targetPersonName, method = 'broadcastChannel', startMessage) {
+        this.targetPersonName = targetPersonName;
+        this.method = method;
+
         if (typeof startMessage === 'string' && startMessage.length) {
             if (method == 'localStorage') {
 
+                this.communicateByLocalStorage(targetPersonName);
+                this.replyMessageUpdate(startMessage);
+            } else {
+                this.receiveMessageByBroadcastChannel(targetPersonName);
+                this.replyMessageUpdate(startMessage);
             }
         } else {
-            throw new Error('Start message not match rules.');
+            if (method == 'localStorage') {
+
+                this.communicateByLocalStorage(targetPersonName);
+            } else {
+                this.receiveMessageByBroadcastChannel(targetPersonName);
+            }
         }
     }
 }

@@ -15,6 +15,8 @@
             是否回复：
             <input type="checkbox" name="replyStatus" id="replyStatusButton" checked>
         </label>
+        <input type="button" value="LocalStorage">
+        <input type="button" value="BroadcastChannel">
     </form>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type='module'>
@@ -35,12 +37,9 @@
 
         LiLei.replySpeed(5000);
 
-        LiLei.receiveMessageByBroadcastChannel('HanMeimei');
-        // liLei.communicateByLocalStorage('HanMeimei');
-
         window.LiLei = LiLei;
         try {
-            LiLei.sendMessageByBroadcastChannel('在吗？');
+            LiLei.beginTalk('HanMeimei', 'localStorage', '在吗?');
         } catch (e) {
             console.log(e);
         }
