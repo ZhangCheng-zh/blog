@@ -9,7 +9,45 @@
 </head>
 
 <body>
+    <div id="dragSource" class='container'>
+        <img src="http://sta.36krcnd.com/common-module/common-header/images/logo-a6afc.png" alt="image" id='imageTarget'>
+    </div>
+    <div id="dragTarget" class='container'>
 
+    </div>
+    <style>
+        .container {
+            border: 1px solid #333;
+            width: 400px;
+            height: 400px;
+
+        }
+
+        #imageTarget {
+            width: 100px;
+        }
+
+        #dragTarget {}
+    </style>
+    <script>
+        let $dragTarget = document.querySelector('#dragTarget');
+
+        $dragTarget.addEventListener('dragenter', (e) => console.log('drag enter'));
+
+        $dragTarget.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.getData('')
+            console.log('drag over')
+        });
+        $dragTarget.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            console.log('drag leave')
+        });
+        $dragTarget.addEventListener('drag', (e) => {
+            e.preventDefault();
+            console.log('drag')
+        });
+    </script>
 </body>
 
 </html>

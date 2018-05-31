@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script type="text/javascript" src="lib.js"></script>
+    <script>
+        window.onload = () => {
+            var encrypt = new JSEncrypt();
+            encrypt.setPublicKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnEXhtvqD8lD5RHg99RFLCrI38PfSo9SfcKzXFvbvyiTxFTSvv/OnPMnk+6LtRXCzn3Z/ZY4eCfGwXxA9jMR+y0erDFleith+VX2VZXzslt+jIcy4YK0XEp14d/iaEaQio1VgiyudLZlv5BJihWjPlqFY2eg3SHpAmurxbgl6VQIDAQAB');
+            var encrypted = encrypt.encrypt('hello world');
+            window.encrypted = encrypted;
+        }
+        // Basic initialization
+
+    </script>
+</body>
+
+</html>
