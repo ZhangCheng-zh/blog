@@ -3,10 +3,7 @@ export class Person {
         let vm = this;
 
         this.config = config || {};
-        this.replyList = [];
 
-
-        this.latestReply = ''
         // 回复的对象
         this.replyTarget = null;
 
@@ -15,6 +12,40 @@ export class Person {
 
         this.customEvent = this.initCustomEvent('update');
 
+        this.hasReplied = false;
+
+        // 默认回复方法
+        this.method = 'broadcastChannel';
+
+        // 创建一个自己的专属channel
+        this.selfBroadcastChannel = new BroadcastChannel(this.config.user.name);
+
+        // 初始化对话控制状态
+        this.replyStatus = true;
+
+        // 初始化相关事件
+        this.initEvents();
+
+        // 初始化相关DOM
+        this.initDoms();
+        // 关闭页面时销毁相关事件
+        window.onunload = () => {
+            vm.destory();
+        }
+    }
+
+    initDoms() {
+        // 初始化是否回复按钮
+        if (this.config.replyButton && this.config.replyButton.nodeType === 1) {
+            let replyButtonHandler = function (e) {
+                this.changeReplyStatus(e.target.checked);
+            }
+
+            this.config.replyButton.addEventListener('change', replyButtonHandler.bind(vm))
+        }
+    }
+
+    initEvents() {
         // 接受消息的属性
         this.$receivedMessage = document.createElement('input');
         this.$receivedMessage.type = 'text';
@@ -27,32 +58,6 @@ export class Person {
         this.$replyMessage.value = '';
         this.$replyMessage.addEventListener('update', this.replyMessageUpdateHandler.bind(this));
 
-        this.hasReplied = false;
-
-        // 默认回复方法
-        this.method = 'broadcastChannel';
-
-
-
-        // 创建一个自己的专属channel
-        this.selfBroadcastChannel = new BroadcastChannel(this.config.user.name);
-
-        // 初始化对话控制状态
-        this.replyStatus = true;
-
-        // 初始化是否回复按钮
-        if (this.config.replyButton && this.config.replyButton.nodeType === 1) {
-            let replyButtonHandler = function (e) {
-                this.changeReplyStatus(e.target.checked);
-            }
-
-            this.config.replyButton.addEventListener('change', replyButtonHandler.bind(vm))
-        }
-
-        // 关闭页面时销毁相关事件
-        window.onunload = () => {
-            vm.destory();
-        }
     }
 
     initCustomEvent(customEventName) {
@@ -82,15 +87,10 @@ export class Person {
             // 通过BroadcastChannel传递消息
             this.sendMessageByBroadcastChannel();
         }
-
     }
 
     confirmReplyMessage(message) {
         this.replyMessageUpdate(message);
-    }
-
-    destory() {
-        this.selfBroadcastChannel.close();
     }
 
     handleReceivedMessage() {
@@ -196,6 +196,7 @@ export class Person {
         }
     }
 
+    // 控制回复速度
     replySpeed(timeInterval) {
         if (typeof timeInterval === 'number' && timeInterval > 1000) {
             this.replyInterval = timeInterval || 1000;
@@ -226,6 +227,14 @@ export class Person {
                 this.receiveMessageByBroadcastChannel(targetPersonName);
             }
         }
+    }
+
+    destory() {
+        this.$receivedMessage.removeEventListener('update', this.receivedMessageUpdateHandler.bind(this));
+        this.$replyMessage.removeEventListener('update', this.replyMessageUpdateHandler.bind(this));
+
+        // 关闭broadcastChannel通道
+        this.selfBroadcastChannel.close();
     }
 }
 

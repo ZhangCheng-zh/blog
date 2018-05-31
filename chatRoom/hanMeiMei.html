@@ -10,7 +10,12 @@
 
 <body>
     <h3>我是HanMeimei：</h3>
-    <iframe src="" frameborder="0" id='hanMeimei'></iframe>
+    <form action="">
+        <label>
+            是否回复：
+            <input type="checkbox" name="replyStatus" id="replyStatusButton" checked>
+        </label>
+    </form>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type='module'>
         import { Person } from './chatRobot.js';
@@ -22,7 +27,7 @@
         }
 
         const HanMeimeiConfig = {
-            frame: document.querySelector('#hanMeimei'),
+            replyButton: document.querySelector('#replyStatusButton'),
             user: HanMeimeiUser
         }
 
