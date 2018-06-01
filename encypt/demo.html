@@ -12,10 +12,59 @@
     <script type="text/javascript" src="lib.js"></script>
     <script>
         window.onload = () => {
+            var b64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+            var b64pad = "=";
+            const SEPERATOR = '~~';
+            const PUBLICKEY = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnEXhtvqD8lD5RHg99RFLCrI38PfSo9SfcKzXFvbvyiTxFTSvv';
+
+            // Convert a byte array to a hex string  
+            function bytesToHex(bytes) {
+                for (var hex = [], i = 0; i < bytes.length; i++) {
+                    hex.push((bytes[i] >>> 4).toString(16));
+                    hex.push((bytes[i] & 0xF).toString(16));
+                }
+                return hex.join("");
+            }
+
+            // Convert a hex string to a byte array  
+            function hexToBytes(hex) {
+                for (var bytes = [], c = 0; c < hex.length; c += 2)
+                    bytes.push(parseInt(hex.substr(c, 2), 16));
+                return bytes;
+            }
+
+
+            function hex2b64(h) {
+                var i;
+                var c;
+                var ret = "";
+                for (i = 0; i + 3 <= h.length; i += 3) {
+                    c = parseInt(h.substring(i, i + 3), 16);
+                    ret += b64map.charAt(c >> 6) + b64map.charAt(c & 63);
+                }
+                if (i + 1 == h.length) {
+                    c = parseInt(h.substring(i, i + 1), 16);
+                    ret += b64map.charAt(c << 2);
+                } else if (i + 2 == h.length) {
+                    c = parseInt(h.substring(i, i + 2), 16);
+                    ret += b64map.charAt(c >> 2) + b64map.charAt((c & 3) << 4);
+                }
+                while ((ret.length & 3) > 0) ret += b64pad;
+                return ret;
+            }
+
+
             var encrypt = new JSEncrypt();
             encrypt.setPublicKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnEXhtvqD8lD5RHg99RFLCrI38PfSo9SfcKzXFvbvyiTxFTSvv/OnPMnk+6LtRXCzn3Z/ZY4eCfGwXxA9jMR+y0erDFleith+VX2VZXzslt+jIcy4YK0XEp14d/iaEaQio1VgiyudLZlv5BJihWjPlqFY2eg3SHpAmurxbgl6VQIDAQAB');
-            var encrypted = encrypt.encrypt('hello world');
-            window.encrypted = encrypted;
+
+            var text = 'key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world';
+            var textArray = [];
+            for (var i = 0; i < text.length; i++) {
+                if (i % 10 > )
+            }
+            var encrypted = encrypt.encrypt(text);
+
+            console.log(encrypted);
         }
         // Basic initialization
 

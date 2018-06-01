@@ -11,6 +11,11 @@
 <body>
     <div id="dragSource" class='container'>
         <img src="http://sta.36krcnd.com/common-module/common-header/images/logo-a6afc.png" alt="image" id='imageTarget'>
+        <a href="http://www.baidu.com">baidu</a>
+        <br>
+        <textarea name="" id="textContainer" cols="30" rows="10">
+
+        </textarea>
     </div>
     <div id="dragTarget" class='container'>
 
@@ -30,21 +35,39 @@
         #dragTarget {}
     </style>
     <script>
+        let $textContainer = document.querySelector('#textContainer');
+        $textContainer.addEventListener('dragstart', (e) => {
+            e.dataTransfer.dropEffect = 'all';
+            e.dataTransfer.effectAllowed = 'all';
+            console.log('dropEffect: ' + e.dataTransfer.dropEffect);
+            console.log(e.dataTransfer.getData('text'));
+        })
+
+
+
         let $dragTarget = document.querySelector('#dragTarget');
 
-        $dragTarget.addEventListener('dragenter', (e) => console.log('drag enter'));
+        $dragTarget.addEventListener('dragenter', (e) => {
+            console.log('dropEffect: ' + e.dataTransfer.dropEffect);
+            console.log('drag enter');
+        });
 
         $dragTarget.addEventListener('dragover', (e) => {
             e.preventDefault();
-            e.dataTransfer.getData('')
             console.log('drag over')
         });
+
         $dragTarget.addEventListener('dragleave', (e) => {
             e.preventDefault();
+            console.log('data: ' + e.dataTransfer.getData('url') || e.dataTransfer.getData('text/uri-list'));
+
             console.log('drag leave')
         });
+
         $dragTarget.addEventListener('drag', (e) => {
             e.preventDefault();
+            console.log('data: ' + e.dataTransfer.getData('url') || e.dataTransfer.getData('text/uri-list'));
+
             console.log('drag')
         });
     </script>
