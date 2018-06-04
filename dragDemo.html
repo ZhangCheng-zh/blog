@@ -34,42 +34,50 @@
 
         #dragTarget {}
     </style>
-    <script>
+    <script type='module'>
+        import { throttle } from './throttle/throttle.js';
+
+        let $imageTarget = document.querySelector('#imageTarget');
+
         let $textContainer = document.querySelector('#textContainer');
-        $textContainer.addEventListener('dragstart', (e) => {
-            e.dataTransfer.dropEffect = 'all';
-            e.dataTransfer.effectAllowed = 'all';
-            console.log('dropEffect: ' + e.dataTransfer.dropEffect);
-            console.log(e.dataTransfer.getData('text'));
-        })
-
-
 
         let $dragTarget = document.querySelector('#dragTarget');
 
-        $dragTarget.addEventListener('dragenter', (e) => {
-            console.log('dropEffect: ' + e.dataTransfer.dropEffect);
-            console.log('drag enter');
-        });
 
-        $dragTarget.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            console.log('drag over')
-        });
+        let dragHandler = (e) => {
+            if (e.type === 'dragstart') {
+                e.dataTransfer.setData('URL', e.target.src);
+            }
 
-        $dragTarget.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            console.log('data: ' + e.dataTransfer.getData('url') || e.dataTransfer.getData('text/uri-list'));
+            console.log('event type: ' + e.type)
+            console.log('event target: ' + e.target.id);
 
-            console.log('drag leave')
-        });
+            if (e.type === 'drop') {
+                e.preventDefault();
+                console.log(e);
+                var url = e.dataTransfer.getData('url') || e.dataTransfer.getData('text/uri-list');
+                e.target.value += url;
+                debugger;
+            }
+        };
 
-        $dragTarget.addEventListener('drag', (e) => {
-            e.preventDefault();
-            console.log('data: ' + e.dataTransfer.getData('url') || e.dataTransfer.getData('text/uri-list'));
+        let throttledDragHandler = throttle(dragHandler, 500);
+        let throttledDragOverHandler = throttle(dragHandler, 500);
 
-            console.log('drag')
-        });
+        $imageTarget.addEventListener('drag', throttledDragHandler);
+
+        $imageTarget.addEventListener('dragstart', dragHandler);
+
+        $imageTarget.addEventListener('dragend', dragHandler);
+
+
+        document.addEventListener('dragenter', dragHandler);
+
+        document.addEventListener('dragover', throttledDragOverHandler);
+
+        document.addEventListener('dragleave', dragHandler);
+
+        document.addEventListener('drop', dragHandler);
     </script>
 </body>
 

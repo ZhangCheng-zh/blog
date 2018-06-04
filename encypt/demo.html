@@ -14,19 +14,40 @@
         window.onload = () => {
             const SEPERATOR = '~~';
 
-            var text = 'key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world&key = hello world';
-            var splitedTextArray = [];
-
-            for (let i = 0; i < text.length; i++) {
-                if ((i + 1) % 10) {
-
-                }
-            }
-
             var encrypt = new JSEncrypt();
             encrypt.setPublicKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTnEXhtvqD8lD5RHg99RFLCrI38PfSo9SfcKzXFvbvyiTxFTSvv/OnPMnk+6LtRXCzn3Z/ZY4eCfGwXxA9jMR+y0erDFleith+VX2VZXzslt+jIcy4YK0XEp14d/iaEaQio1VgiyudLZlv5BJihWjPlqFY2eg3SHpAmurxbgl6VQIDAQAB');
 
-            var encrypted = encrypt.encrypt(text);
+            let text = '01234567890123456789012345678901234567890123456789012345678901234';
+
+            function splitTextIntoTextArray(targetText, perLength) {
+                if (typeof targetText != 'string' || typeof perLength != 'number') {
+                    throw new Error('params type error');
+                }
+
+                var splitedTextArray = [];
+                var lastSplitedIndex = 0;
+
+                for (let i = 0; i < targetText.length; i++) {
+                    if (i === targetText.length - 1) {
+                        splitedTextArray.push(targetText.substring(lastSplitedIndex));
+                    } else if ((i + 1) % 10 === 0) {
+                        splitedTextArray.push(targetText.substring(i - 9, i + 1));
+                        lastSplitedIndex = i + 1;
+                    }
+                }
+                return splitedTextArray;
+            }
+
+            let splitedTextArray = splitTextIntoTextArray(text, 10);
+
+            let encryptedSplitedTextArray = splitedTextArray.map(item => encrypt.encrypt(item));
+
+            let joinedEncryptedText = encryptedSplitedTextArray.join('~~');
+            console.log(joinedEncryptedText);
+
+            function discreteEncrypt(targetText, perLength, seperator, encrypt) {
+
+            }
         }
         // Basic initialization
 
