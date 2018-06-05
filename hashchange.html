@@ -10,11 +10,28 @@
 
 <body>
     <script>
+        window.onerror = (mes, url, line) => {
+            console.dir(arguments);
+            return false
+        }
+
         if (window.HashChangeEvent) {
             window.onhashchange = () => {
                 alert(location.href);
             }
+
+            window.addEventListener('popstate', (e) => {
+                console.log(e.type);
+                console.dir(e.state);
+            })
+
+            window.addEventListener('pushstate', (e) => {
+                console.log(e.type);
+                console.dir(e.state);
+            })
         }
+
+        1++2;
     </script>
 </body>
 
