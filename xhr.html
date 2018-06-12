@@ -8,12 +8,35 @@
 </head>
 <body>
     <script>
+        function addURLParam (url, name, value) {
+            if (url.indexof('?') === -1) {
+                url += '?'
+            } else {
+                url += '&'
+            }
+            
+            url += encodeURLComponent(name);
+            url += '=';
+            url += encodeURLComponent(value);
+            
+            return url;
+        }
+
         let xhr = new XMLHttpRequest();
 
         xhr.onreadystatechange = function (e) {
-            xhr.readyState
-            debugger;
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200 || xhr.status < 300) {
+                    let response = xhr.responseText;
+                    console.dir(response);
+                    
+                    let responseHeaders = xhr.getAllResponseHeaders();
+                    console.dir(responseHeaders);
+                }
+            }
         }
+        xhr.open('get', 'http://via.placeholder.com/350x150', true);
+        xhr.send(new FormData());
     </script>
 </body>
 </html>
