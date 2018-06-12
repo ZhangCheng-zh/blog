@@ -1,1 +1,0 @@
-window.onerror = (mes, url, line) { console.dir(mes);console.dir(url);console.dir(line)}
