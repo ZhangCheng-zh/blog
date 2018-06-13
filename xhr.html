@@ -26,16 +26,25 @@
 
         xhr.onreadystatechange = function (e) {
             if (xhr.readyState === 4) {
-                if (xhr.status === 200 || xhr.status < 300) {
-                    let response = xhr.responseText;
-                    console.dir(response);
-                    
-                    let responseHeaders = xhr.getAllResponseHeaders();
-                    console.dir(responseHeaders);
+                try {
+                    if (xhr.status === 200 || xhr.status < 300) {
+                        let response = xhr.responseText;
+                        console.dir(response);
+                        
+                        let responseHeaders = xhr.getAllResponseHeaders();
+                        console.dir(responseHeaders);
+                    }
+                } catch (e) {
+                    // ......
                 }
+
             }
         }
         xhr.open('get', 'http://via.placeholder.com/350x150', true);
+        xhr.timeout = 1000;
+        xhr.ontimeout = function () {
+            alert('Request did not return in a second');
+        }
         xhr.send(new FormData());
     </script>
 </body>
