@@ -41,11 +41,13 @@
             }
         }
         xhr.open('get', 'http://via.placeholder.com/350x150', true);
+
         xhr.timeout = 1000;
         xhr.ontimeout = function () {
             alert('Request did not return in a second');
         }
-        xhr.send(new FormData());
+
+        xhr.send();
     </script>
 </body>
 </html>
