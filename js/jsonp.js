@@ -1,3 +1,5 @@
+// 创建标签 => 创建回调函数 => 发送请求 => 处理请求 => 销毁相关方法和属性
+
 let params = {
     url: 'http://freegeoip.net/json/',
     callbackName: 'responseHandle',
@@ -48,5 +50,4 @@ function jsonp (params) {
             params.error && params.error('请求超时');
         }, params.time)
     }
-    
 }
