@@ -29,6 +29,8 @@ app.use(async (ctx, next) => {
 
 app.use(async (ctx) => {
   ctx.body = 'Hello World';
+
+  await setTimeout(() => {}, 1000);
 });
 
 // error handler
