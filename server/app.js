@@ -10,7 +10,7 @@ app.use(async (ctx, next) => {
   await next();
 
   const ms = Date.now() - start;
-  ctx.set('x-Response-Time', `${ms}ms`);
+  ctx.set('X-Response-Time', `${ms}ms`);
 });
 
 
