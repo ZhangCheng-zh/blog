@@ -3,7 +3,6 @@ const Koa = require('koa');
 const app = new Koa();
 
 // x-response-time
-
 app.use(async (ctx, next) => {
   const start = Date.now();
 
@@ -12,7 +11,6 @@ app.use(async (ctx, next) => {
   const ms = Date.now() - start;
   ctx.set('X-Response-Time', `${ms}ms`);
 });
-
 
 
 // logger
@@ -27,7 +25,6 @@ app.use(async (ctx, next) => {
 });
 
 // response
-
 app.use(async (ctx) => {
   ctx.body = 'Hello World';
 
