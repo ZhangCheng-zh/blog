@@ -1,166 +1,259 @@
 """
-Problem: Thread-Safe Time-Based Key-Value Store with Windowed Average
+Design a data structure WindowedMap that stores (key, value) events and supports queries over the last 5 minutes.
 
-Design and implement a high-throughput time-based key-value store that supports storing multiple values for the same key at different timestamps and querying values at a given time.
+Window rule
 
-In addition to standard time-based lookup, the store must support computing a sliding-window average over recent numeric values, where values older than the window are considered expired for the average calculation.
+At query time t, an entry (key, value, ts) is valid if ts >= t - 5min.
 
-Because the system is used in a concurrent environment, your implementation must be thread-safe.
+APIs
+addEvent(key: str, val: int, timestamp: int) -> None
+getKey(key: str, timestamp: int) -> int        # if key valid in last 5min, return val; else throw/raise
+delete(key: str) -> None
+avg(timestamp: int) -> float                   # average of all valid values in last 5min; if none, return 0.0
 
-Implement TimeMap
-Constructor
+Notes
 
-TimeMap(): Initializes the data structure.
+Each key keeps only its most recent event (a new addEvent replaces the old one).
 
-Methods
-set(key: str, value: str, timestamp: int) -> None
+You may assume timestamp values passed to addEvent are non-decreasing.
 
-Stores the value for the given key at the given timestamp.
+Aim for high performance:
 
-Notes:
+addEvent, getKey, delete: O(1) amortized
 
-A key may be stored many times at different timestamps.
-
-You may assume that for the same key, timestamps provided to set are non-decreasing.
-
-get(key: str, timestamp: int) -> str
-
-Returns the value such that:
-
-It was previously stored using set(key, value, timestamp_prev)
-
-timestamp_prev <= timestamp
-
-and timestamp_prev is the largest such timestamp
-
-If no such value exists, return "".
-
-getAverage(key: str, timestamp: int, window: int) -> float
-
-Computes the average of numeric values for a key within a sliding window ending at timestamp.
-
-Only values with timestamps in:
-
-[timestamp - window + 1, timestamp]
-are included. Values outside this range are considered expired for the purpose of the average.
-
-Rules:
-
-If a stored value is not numeric (cannot be parsed as a float), it is ignored for average computation.
-
-If there are no numeric values in the window, return 0.0.
-
-Concurrency Requirement
-
-Your solution must be thread-safe and should allow high throughput by minimizing contention:
-
-Operations on different keys should proceed concurrently when possible.
-
-You may use a global lock only for managing shared metadata (like per-key structures), and a per-key lock for updating/querying data for that key.
-
-Example
-tm = TimeMap()
-tm.set("foo", "10", 1)
-tm.set("foo", "20", 3)
-tm.set("foo", "bar", 4)
-
-tm.get("foo", 2)            # "10"
-tm.get("foo", 4)            # "bar"
-
-tm.getAverage("foo", 4, 4)  # window [1..4] -> numeric values: 10, 20 -> avg = 15.0
-tm.getAverage("foo", 4, 2)  # window [3..4] -> numeric values: 20 -> avg = 20.0
-tm.getAverage("foo", 2, 1)  # window [2..2] -> none -> 0.0
-
-Complexity Targets
-
-set: amortized O(1)
-
-get: O(log n) for that key
-
-getAverage: O(log n) for that key
-
-Thread-safe with minimal contention
+avg: O(1) amortized
 """
 
-from bisect import bisect_left, bisect_right
+# Node for linkedList
+class Node:
+    def __init__(self, key='', val = 0, ts = 0):
+        self.key, self.val, self.ts = key, val, ts
+        self.prev = self.next = None 
+
+class WindowedMap:
+    def __init__(self, window=300):
+        self.window = window 
+        self.mp = {}
+        self.dummy = Node() # dummy is head and tail node
+        self.dummy.prev = self.dummy.next = self.dummy
+        self.sum = 0 # record sum of val
+        self.cnt = 0 # record count of node
+
+    # remove node from linkedlist
+    def _remove(self, node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    # add node at head of list
+    def _add_front(self, node):
+        node.prev = self.dummy
+        node.next = self.dummy.next
+        self.dummy.next.prev = node
+        self.dummy.next = node 
+    
+    def _purge(self, t):
+        cutoff = t - self.window + 1
+        while self.dummy.prev != self.dummy and self.dummy.prev.ts < cutoff:
+            old = self.dummy.prev
+            self._remove(old)
+            self.mp.pop(old.key, None)
+            self.sum -= old.val
+            self.cnt -= 1
+    
+    def put(self, key, val, t):
+        self._purge(t)
+
+        if key in self.mp:
+            old = self.mp.pop(key)
+            self._remove(old)
+            self.sum -= old.val
+            self.cnt -= 1
+        
+        node = Node(key, val, t)
+        self._add_front(node)
+        self.mp[key] = node
+        self.sum += val
+        self.cnt += 1
+    
+    def get(self, key, t):
+        self._purge(t)
+        node = self.mp.get(key)
+        if not node:
+            raise KeyError('not found key')
+
+        node.ts = t
+        self._remove(node)
+        self._add_front(node)
+
+        return node.val
+
+    def delete(self, key):
+        node = self.mp.pop(key, None)
+        if not node:
+            return 
+        self._remove(node)
+        self.sum -= node.val
+        self.cnt -= 1
+
+    def avg(self, t):
+        self._purge(t)
+        return 0.0 if self.cnt == 0 else self.sum / self.cnt
+    
+wm = WindowedMap(window=5)
+
+wm.put("a", 10, 1)
+wm.put("b", 20, 2)
+
+assert wm.get("a", 2) == 10          # access updates ts(a)=2
+assert abs(wm.avg(2) - 15.0) < 1e-9     # a(2), b(2)
+
+# at t=6, window is [2..6], b(ts=2) still valid, a(ts=2) valid
+assert abs(wm.avg(6) - 15.0) < 1e-9
+
+# access a at t=6, refresh ts(a)=6
+assert wm.get("a", 6) == 10
+
+# at t=7, window is [3..7], b(ts=2) expires, a(ts=6) stays
+assert abs(wm.avg(7) - 10.0) < 1e-9
+
+try:
+    wm.get("b", 7)
+    assert False
+except KeyError:
+    pass
+
+wm.delete("a")
+assert abs(wm.avg(7) - 0.0) < 1e-9
+
+
+
+"""
+Use N independent WindowedMaps (each with its own lock), and route keys by hash:
+reduces contention a lot
+still “global lock” per shard, but not for the whole system
+avg() becomes: sum averages across shards (or sum/cnt across shards) — requires reading each shard (still fine).
+"""
 import threading
-from typing import Dict, List
 
-class TimeMap:
-    def __init__(self):
-        # key -> (times, vals)
-        self.times: Dict[str, List[int]] = {}
-        self.vals: Dict[str, List[str]] = {}
+# node for linkedlist
+class Node:
+    def __init__(self, key='', val = 0, ts = 0):
+        self.key, self.val, self.ts = key, val, ts
+        self.prev = self.next = None 
 
-        # key -> (num_times, prefix_sum) where prefix_sum[0] = [0.0]
-        self.numTimes: Dict[str, List[int]] = {}
-        self.numPrefix: Dict[str, List[float]] = {}
-
-        # per-key locks + a meta lock to safely create them
-        self.locks: Dict[str, threading.Lock] = {}
-        self.metaLock = threading.Lock()
+class Shard:
+    def __init__(self, window: int):
+        self.window = window
+        self.mp = {}
+        self.dummy = Node()
+        self.dummy.prev = self.dummy.next = self.dummy
+        self.sum = 0
+        self.cnt = 0
+        self.lock = threading.RLock()
     
-    def set(self, key, value, timestamp) -> None:
-        # create/fetch lock and per-key containers safely
-        with self.metaLock:
-            lock = self.locks.get(key)
-            if lock is None:
-                lock = threading.Lock()
-                self.locks[key] = lock
+    def _remove(self, node: Node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+    
+    def _add_front(self, node):
+        node.prev = self.dummy
+        node.next = self.dummy.next
+        self.dummy.next.prev = node 
+        self.dummy.next = node 
+    
+    def _purge(self, t):
+        cutoff = t - self.window + 1
+        while self.dummy.prev != self.dummy and self.dummy.prev.ts < cutoff:
+            old = self.dummy.prev
+            self._remove(old)
+            self.mp.pop(old.key, None)
+            self.sum -= old.val
+            self.cnt -= 1
+    
+    def put(self, key, val, t):
+        with self.lock:
+            self._purge(t)
+            if key in self.mp:
+                old = self.mp.pop(key)
+                self._remove(old)
+                self.sum -= old.val
+                self.cnt -= 1
             
-            if key not in self.times:
-                self.times[key] = []
-                self.vals[key] = []
-                self.numTimes[key] = []
-                self.numPrefix[key] = [0.0] # prefix sums
-            
-            times = self.times[key]
-            vals = self.vals[key]
-            numTimes = self.numTimes[key]
-            numPrefix = self.numPrefix[key]
-        
-        with lock:
-            times.append(timestamp)
-            vals.append(value)
-            # numeric track for getAverage
-            try:
-                num = float(value)
-            except ValueError:
-                return 
-            numTimes.append(timestamp)
-            numPrefix.append(numPrefix[-1] + num)
+            node = Node(key, val, t)
+            self._add_front(node)
+            self.mp[key] = node
+            self.sum += ValueError
+            self.cnt += 1
     
-    def get(self, key: str, timestamp: int) -> str:
-        with self.metaLock:
-            lock = self.locks.get(key)
-            times = self.times.get(key)
-            vals = self.vals.get(key)
+    def get(self, key, t):
+        with self.lock:
+            self._purge(t)
+            node = self.mg.get(key)
+            if not node:
+                raise KeyError('not found key')
 
-        if lock is None or not times:
-            return ''
-        
-        with lock:
-            i = bisect_right(times, timestamp) - 1
-            return '' if i < 0 else vals[i]
+            # refresh on access
+            node.ts = t
+            self._remove(node)
+            self._add_front(node)
+            return node.val 
     
-    def getAverage(self, key, timestamp, window) -> float:
-        if window <= 0:
-            return 0.0
-
-        left_ts = timestamp - window + 1
-
-        with self.metaLock:
-            lock = self.locks.get(key)
-            times = self.numTimes.get(key)
-            prefix = self.numPrefix.get(key)
-        if lock is None or not times:
-            return 0.0
-
-        with lock:
-            l = bisect_left(times, left_ts)
-            r = bisect_right(times, timestamp)
-
-            total = prefix[r] - prefix[l]
-            return total / (r - l)
-
+    def delete(self, key):
+        with self.lock:
+            node = self.mp.pop(key, None)
+            if not node:
+                return
+            self._remove(node)
+            self.sum -= node.val
+            self.cnt -= 1
+    
+    def snapshot_sum_cnt(self, t) -> tuple[int, int]:
+        with self.lock:
+            self._purge(t)
+            return self.sum, self.cnt
         
+class ShardedWindowedMap:
+    def __init__(self, window = 300, shards = 16):
+        self.window = window
+        self.shards = [Shard(window) for _ in range(shards)]
+        self.n = shards
+    
+    def _idx(self, key) -> str:
+        return hash(key) % self.n 
+    
+    def put(self, key, val, t):
+        self.shards[self._idx(key)].put(key, val, t)
+    
+    def get(self, key, t):
+        return self.shards[self._idx(key)].get(key, t)
+
+    def delete(self, key):
+        self.shards[self._idx(key)].delete(key)
+
+    def avg(self, t):
+        totalSum, totalCnt = 0, 0
+        for sh in self.shards:
+            s, c = sh.snapshot_sum_cnt(t)
+            totalSum += s
+            totalCnt += c
+        return 0,0 if totalCnt == 0 else totalSum/ totalCnt
+    
+    # strong consistent snapshot avg
+    def avg(self, t: int) -> float:
+        # 1) acquire all shard locks in a fixed order (avoid deadlock)
+        for sh in self.shards:
+            sh.lock.acquire()
+
+        try:
+            total_sum, total_cnt = 0, 0
+            # 2) now it's a consistent snapshot: no shard can change while we read
+            for sh in self.shards:
+                sh._purge(t)              # safe: we already hold sh.lock
+                total_sum += sh.sum
+                total_cnt += sh.cnt
+
+            return 0.0 if total_cnt == 0 else total_sum / total_cnt
+        finally:
+            # 3) release in reverse order (common practice)
+            for sh in reversed(self.shards):
+                sh.lock.release()
