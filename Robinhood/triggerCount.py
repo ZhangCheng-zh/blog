@@ -57,7 +57,7 @@ def triggerCount(edges, entry):
                 visited.add(v)
                 q.append(v)
 
-    return dict(count) # time O(V + E) space O(V + E)
+    return count # time O(V + E) space O(V + E)
 
 def triggerCountTopo(edges, entry):
     g = defaultdict(list)
@@ -83,7 +83,7 @@ def triggerCountTopo(edges, entry):
             count[v] += count[u]
             if indegree[v] == 0:
                 q.append(v)
-    return dict(count)
+    return count
 
 
 
