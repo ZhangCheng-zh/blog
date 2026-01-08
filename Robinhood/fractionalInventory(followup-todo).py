@@ -33,7 +33,9 @@ After each order, **flatten** inventory for that symbol:
 Return the final `inventory` list in the **same order and format** as the input inventory:
 `["SYMBOL", "FRACTION"]` (still scaled by 100).
 
+fractional sharing，就是input有些变化，每个order和inventory的元素都变成string，然后内部通过 / 分隔。
 """
+
 # result is real fraction share * 100
 def parseQtyToShare100(qty, price100Str):
     if qty.startswith('$'): # qty is money
