@@ -31,45 +31,35 @@ No trailing or leading spaces.
 
 Output should be a single string.
 """
+class Solution:
+    # 1 to 9 billion
+    def integer_to_word(self, num):
+        specials = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split(" ")
+        tens = "twenty thirty forty fifty sixty seventy eighty ninety".split(" ")
+        hundred = "hundred"
+        thousand = "thousand"
+        million = "million"
+        billion = "billion"
 
-def numberToWords(n):
-    if n == 0:
-        return 'zero'
-    
-    under_20 = [
-        "", "one", "two", "three", "four", "five", "six", "seven",
-        "eight", "nine", "ten", "eleven", "twelve", "thirteen",
-        "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
-    ]
-
-    tens = [
-        "", "", "twenty", "thirty", "forty", "fifty",
-        "sixty", "seventy", "eighty", "ninety"
-    ]
-
-    def twoDigits(num):
         if num < 20:
-            return under_20[num]
-        t, r = divmod(num, 10)
-        return tens[t] + (f"-{under_20[r]}" if r else '')
+            return specials[num]
+        if num < 100:
+            if num % 10 == 0:
+                return tens[num // 10 - 2]
+            return tens[num // 10 - 2] + "-" + self.integer_to_word(num % 10)
+        if num < 1000:
+            if num % 100 == 0:
+                return self.integer_to_word(num // 100) + " " + hundred
+            return  self.integer_to_word(num // 100) + " " + hundred + " and " + self.integer_to_word(num % 100)
+        if num < 1000000:
+            if num % 1000 == 0:
+                return self.integer_to_word(num // 1000) + " " + thousand
+            return  self.integer_to_word(num // 1000) + " " + thousand + " " + self.integer_to_word(num % 1000)
+        if num < 1000000000:
+            if num % 1000000 == 0:
+                return self.integer_to_word(num // 1000000) + " " + million
+            return  self.integer_to_word(num // 1000000) + " " + million + " " + self.integer_to_word(num % 1000000)
 
-    def threeDigits(num):
-        h, r = divmod(num, 100)
-        if h == 0:
-            return twoDigits(r)
-        if r == 0:
-            return under_20[h] + 'hundred'
-        return under_20[h] + ' hundred and ' + twoDigits(r)
-    
-    parts = []
-    thousands, rest = divmod(n, 1000)
-
-    if thousands:
-        parts.append(threeDigits(thousands) + " thousand") 
-    if rest:
-        parts.append(threeDigits(rest))
-
-    return ' '.join(parts)
 
 print(numberToWords(7))      # "seven"
 print(numberToWords(77))     # "seventy-seven"
