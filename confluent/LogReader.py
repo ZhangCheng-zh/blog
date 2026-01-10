@@ -26,144 +26,128 @@ print(lr.search("ERROR"))  # True/False
 lr.close()
 """
 
-
-
-# import os
-# class LogReader:
-#     # a very large log file on disk, need read into memory by chunk
-#     def __init__(self, filename, blockSize = 4096):
-#         self.filename = filename
-#         self.blockSize = blockSize
-
-#         self.file = open(filename, 'rb')
-    
-#     def tail(self, n):
-#         # f.seek, f.tell, f.read
-#         f = self.file 
-#         # end position
-#         f.seek(0, os.SEEK_END)
-#         pos = f.tell()
-
-#         newlines = 0 # record the '/n' count
-#         result = 0 # record return position
-
-#         while pos > 0 or newlines <= n: # scan from tail to head, reach head or find the n + 1 '/n', then stop
-#             # start of each chunk
-#             chunk = min(pos, self.blockSize)
-#             # got to chun head
-#             pos -= chunk
-#             f.seek(pos)
-            
-#             # read the chunk
-#             data = f.read(chunk) # data is list of chunk file
-
-#             for i in range(chunk - 1, -1, -1):
-#                 if data[i] == ord('\n'):
-#                     newlines += 1
-#                 if newlines == n + 1:
-#                     result = pos + i + 1
-#                     f.seek(result)
-#                     return f.read().decode('utf-8')
-#         # not find enough newlines in whole file, return whole file directly
-#         f.seek(0)
-#         return f.read().decode('utf-8')
-
-#     def search(self, phrase):
-#         f = self.file
-#         f.seek(0)
-
-#         phrase = phrase.encode('utf-8')
-#         m = len(phrase)
-
-#         # pick previous chunk's tail as head of next chunk
-#         # to find cross chunk phrase
-#         prevTail = b''
-
-#         while True:
-#             chunk = f.read(self.blockSize)
-#             if not chunk: # no more file
-#                 break
-
-#             data = prevTail + chunk
-
-#             idx = data.find(phrase)
-#             if idx != -1:
-#                 return True # find target
-            
-#             prevTail = data[-(m + 1):]
-#         return False
-    
-#     def close(self):
-#         self.file.close()
-            
-
-
 import os
+import tempfile
 class LogReader:
     def __init__(self, filename, blocksize = 4096):
         self.filename = filename
-        self.blocksize = blocksize
-        self.file = open(filename, 'rb')
-    
+        self.blocksize = blocksize # 4kb per time
+        self.file = open(filename, 'rb') # open in read and binary mode
+
     def tail(self, n):
-        f = self.file 
+        if n <= 0:
+            return ''
+        
+        f = self.file # f point to the same file object
+        f.seek(0, os.SEEK_END) # move the file cursor to the very end of the file
+        pos = f.tell() # return the current cursor position an an integer, now pos is the file size in bytes
 
-        f.seek(0, os.SEEK_END)
-        pos = f.tell() # get the position of file end
+        newlines = 0
 
-        newlines = 0 # record the count of '\n'
-        result = 0 # store the head of return file
-
+        # if pos >= 0, the lopp will infinite
         while pos > 0 and newlines <= n:
-            chunk = min(pos, self.blocksize) # size of next chunk
-
-            pos -= chunk # head point to head of chunk
+            chunk = min(pos, self.blocksize) # if left file part smaller than blocksize, chunk equal left file part
+            pos -= chunk # move curosr of head of target chunk file
             f.seek(pos)
 
-            data = f.read(chunk)
+            data  = f.read(chunk)
             for i in range(chunk - 1, -1, -1):
-                if data[i] == ord('\n'):
+                if data[i] == ord('\n'): # ord('\n') is 10
                     newlines += 1
-                if newlines == n + 1:
-                    result = pos + i + 1
-                    f.seek(result)
-                    return f.read().decode('utf-8')
-        
+                    if newlines == n + 1: # find the n + 1 '\n' in reverse order
+                        res = pos + i + 1
+                        f.seek(res) # move cursor to next code after (n + 1)th '\n'
+                        return f.read().decode('utf-8') # read out all content start from cursor
         f.seek(0)
         return f.read().decode('utf-8')
-
+         
+    
     def search(self, phrase):
-        f = self.file 
-
-        phrase = phrase.encode('utf-8')
-        m = len(phrase)
-
+        # f.read() return bytes, not a python str
+        target = phrase.encode('utf-8')
+        m = len(target)
+        if m == 0:
+            return True
+        
+        f = self.file
+        f.seek(0) # set cursor to head of file object
+        
         prevTail = b''
 
-        f.seek(0)
-        pos = f.tell() # start scan from head
-
         while True:
-            chunk = self.blocksize
-
-            data = f.read(chunk)
+            data = f.read(self.blocksize)
             if not data:
-                break # already scan all file
+                return False 
             data = prevTail + data
-
-            idx = data.find(phrase)
-            if idx >= 0:
+            if data.find(target) != -1:
                 return True
             
-            prevTail = data[-(m + 1):]
-            pos += chunk
+            prevTail = data[-(m - 1):]
         
-        return False
+
+    def close(self):
+        self.file.close()
 
 
-lr = LogReader('./log.txt')
-print(lr.tail(5))
-# print(lr.tail(100))
-print(lr.search('k'))
-print(lr.search('t'))
-print(lr.search('s'))
+import os
+import tempfile
+
+def writeTempLog(text: str) -> str:
+    if text and not text.endswith("\n"):
+        text += "\n"
+
+    fd, path = tempfile.mkstemp()
+    os.close(fd)
+    with open(path, "wb") as f:
+        f.write(text.encode("utf-8"))
+    return path
+
+# tail: always ends with newline
+path = writeTempLog("a\nb\nc\nd\ne")
+lr = LogReader(path, 4)  # small block forces backward multi-read
+assert lr.tail(2).splitlines() == ["d", "e"]
+assert lr.tail(5).splitlines() == ["a", "b", "c", "d", "e"]
+assert lr.tail(10).splitlines() == ["a", "b", "c", "d", "e"]
+assert lr.tail(0) == ""
+lr.close()
+os.remove(path)
+
+# tail: single line + newline
+path = writeTempLog("onlyOneLine")
+lr = LogReader(path, 3)
+assert lr.tail(1).splitlines() == ["onlyOneLine"]
+lr.close()
+os.remove(path)
+
+# tail: empty file (no newline)
+path = writeTempLog("")
+lr = LogReader(path, 8)
+assert lr.tail(3) == ""
+lr.close()
+os.remove(path)
+
+# search: basic present/absent
+path = writeTempLog("hello world\nERROR here\nbye")
+lr = LogReader(path, 8)
+assert lr.search("ERROR") is True
+assert lr.search("MISSING") is False
+lr.close()
+os.remove(path)
+
+# search: cross-boundary match (phrase spans chunks)
+path = writeTempLog("abcde")  # with block=4, "abcd" + "e\n"
+lr = LogReader(path, 4)
+assert lr.search("cde") is True
+assert lr.search("de\n") is True
+assert lr.search("cdef") is False
+lr.close()
+os.remove(path)
+
+# search: UTF-8 phrase spanning chunks
+path = writeTempLog("aa你好吗bb")
+lr = LogReader(path, 5)
+assert lr.search("你好吗") is True
+assert lr.search("好吗b") is True
+assert lr.search("不存在") is False
+lr.close()
+os.remove(path)
