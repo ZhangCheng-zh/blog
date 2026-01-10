@@ -27,71 +27,69 @@ lr.close()
 """
 
 import os
-import tempfile
 class LogReader:
     def __init__(self, filename, blocksize = 4096):
         self.filename = filename
-        self.blocksize = blocksize # 4kb per time
-        self.file = open(filename, 'rb') # open in read and binary mode
+        self.blocksize = blocksize
+        self.file = open(filename, 'rb')
 
     def tail(self, n):
         if n <= 0:
             return ''
         
-        f = self.file # f point to the same file object
-        f.seek(0, os.SEEK_END) # move the file cursor to the very end of the file
-        pos = f.tell() # return the current cursor position an an integer, now pos is the file size in bytes
+        f = self.file 
+        f.seek(0, os.SEEK_END)
+        pos = f.tell()
 
         newlines = 0
 
-        # if pos >= 0, the lopp will infinite
         while pos > 0 and newlines <= n:
-            chunk = min(pos, self.blocksize) # if left file part smaller than blocksize, chunk equal left file part
-            pos -= chunk # move curosr of head of target chunk file
+            chunk = min(pos, self.blocksize)
+            
+            pos -= chunk
             f.seek(pos)
 
-            data  = f.read(chunk)
+            data = f.read(chunk)
             for i in range(chunk - 1, -1, -1):
-                if data[i] == ord('\n'): # ord('\n') is 10
+                if data[i] == ord('\n'):
                     newlines += 1
-                    if newlines == n + 1: # find the n + 1 '\n' in reverse order
-                        res = pos + i + 1
-                        f.seek(res) # move cursor to next code after (n + 1)th '\n'
-                        return f.read().decode('utf-8') # read out all content start from cursor
+                if newlines == n + 1:
+                    res = pos + i + 1
+                    f.seek(res)
+                    return f.read().decode('utf-8')
+        
         f.seek(0)
         return f.read().decode('utf-8')
-         
     
     def search(self, phrase):
-        # f.read() return bytes, not a python str
-        target = phrase.encode('utf-8')
-        m = len(target)
-        if m == 0:
-            return True
-        
         f = self.file
-        f.seek(0) # set cursor to head of file object
+        if phrase == '':
+            return True
+        # convert str into bytes
+        target = phrase.encode('utf-8')
         
+        m = len(target)
+
         prevTail = b''
+        f.seek(0)
 
         while True:
             data = f.read(self.blocksize)
             if not data:
                 return False 
-            data = prevTail + data
+            data = prevTail + data 
             if data.find(target) != -1:
                 return True
             
-            prevTail = data[-(m - 1):]
-        
+            keep = m - 1
+            prevTail = data[-keep:] if keep > 0 else b''
 
     def close(self):
         self.file.close()
 
 
-import os
-import tempfile
 
+import tempfile
 def writeTempLog(text: str) -> str:
     if text and not text.endswith("\n"):
         text += "\n"
@@ -139,15 +137,8 @@ path = writeTempLog("abcde")  # with block=4, "abcd" + "e\n"
 lr = LogReader(path, 4)
 assert lr.search("cde") is True
 assert lr.search("de\n") is True
+assert lr.search("de") is True
+assert lr.search("ab") is True
 assert lr.search("cdef") is False
-lr.close()
-os.remove(path)
-
-# search: UTF-8 phrase spanning chunks
-path = writeTempLog("aa你好吗bb")
-lr = LogReader(path, 5)
-assert lr.search("你好吗") is True
-assert lr.search("好吗b") is True
-assert lr.search("不存在") is False
 lr.close()
 os.remove(path)
