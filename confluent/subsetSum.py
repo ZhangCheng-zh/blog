@@ -155,27 +155,6 @@ def subsetSumPathDP(nums, target):
     
     return True, res[::-1]
 
-# def subsetSumPathDP(nums, target):
-#     dp = [-1] * (target + 1)
-#     dp[0] = -2
-
-#     for i, num in enumerate(nums):
-#         for t in range(target, num - 1, -1):
-#             if dp[t] == -1 and dp[t - num] != -1:
-#                 dp[t] = i # the latest num chose
-    
-#     if dp[target] == -1:
-#         return False, []
-    
-#     res = []
-#     t = target
-#     while t > 0:
-#         i = dp[t]
-#         res.append(nums[i])
-#         t -= nums[i]
-#     return True, res[::-1]
-
-
 print(subsetSumPathDP([1,2,3,4], 3))
 print(subsetSumPathDP([1,2,3,4], 10))
 print(subsetSumPathDP([1,2,3,4], 12))
