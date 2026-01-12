@@ -19,17 +19,11 @@ def matchStr(s, p):
     if '*' not in p:
         return s == p
     
-    index = p.find('*')
-    prefix = p[:index]
-    suffix = p[index + 1:]
-
-    if len(s) < len(prefix) + len(suffix):
-        return False
-
-    # s should have same prefix and same suffix
-    if s.startswith(prefix) and s.endswith(suffix):
-        return True 
-    return False
+    left, right = p.split('*')
+    if len(s) < len(left) + len(right):
+        return False 
+    
+    return s.startswith(left) and s.endswith(right)
 
 assert matchStr("","") == True
 assert matchStr("","a") == False
@@ -61,83 +55,49 @@ s="", p="**" → True
 # p has 0 - n '*' 
 def matchStr2(s, p):
     if '*' not in p:
-        return s == p
-     
+        return s == p 
+
     parts = p.split('*')
-    parts = [seg for seg in parts if seg]
+    parts = [p for p in parts if p != '']
 
     startWithStar = p[0] == '*'
     endWithStar = p[-1] == '*'
 
+    # use two pointer match s and p
     i = 0
-    # use pointer scan s, if match each part of p
-    
-    # if p not start with '*', head of s should match parts[0]
-    if not startWithStar and parts:
-        if not s.startswith(parts[0]): 
-            return False
-        i = len(parts[0]) # next start position of pointer
-        parts = parts[1:] # update left parts
-        
-    # if p not end with '*', end of s should match parts[-1]
-    last = None
-    if not endWithStar and parts:
-        last = parts[-1] # save end of p temperally
-        parts = parts[:-1]
-    
-    # try match middle parts
-    for part in parts:
-        pos = s.find(part, i)
-        if pos == -1: # not find next match
-            return False
-        i = pos + len(part) # update next start pointer
-    
-    # check last if match
-    # s must end with last and head index of not scanned s should be smaller than head index of last
-    if last is not None:
-        lastStartIndex = len(s) - len(last)
-        if i > lastStartIndex:
-            return False
-        return s.endswith(last)
-
-    return True
-
-
-def matchStr2(s, p):
-    if '*' not in p:
-        return s == p
-    
-    startWithStar = p[0] == '*'
-    endWithStar = p[-1] == '*'
-
-    i = 0 
-
-    parts = [seg for seg in p.split('*') if seg]
 
     if not startWithStar and parts:
         if not s.startswith(parts[0]):
             return False
         i = len(parts[0])
         parts = parts[1:]
-    
-    tail = None
+
+    last = None
     if not endWithStar and parts:
-        tail = parts[-1]
+        last = parts[-1]
         parts = parts[:-1]
     
-    for part in parts:
-        pos = s.find(part, i)
-        if pos == -1:
-            return False
-        i = pos + len(part)
     
-    if tail is not None:
-        tailIdx = len(s) - len(tail)
-        if i > tailIdx:
+    # match all middle part
+    for p in parts:
+        tmp = s.find(p, i)
+        if tmp == -1:
             return False
-        return s.endswith(tail)
+        i = tmp + len(p)
+    
+    # if exist tail, need match
+    if last:
+        lastStartIndex = len(s) - len(last)
         
+        # tail of s is shorter than tail of p
+        if i > lastStartIndex:
+            return False
+        
+        return s.endswith(last)
     return True
+        
+    
+    
 
 # Empty / exact cases
 assert matchStr2("", "") == True
