@@ -114,8 +114,6 @@ def solveSudoku(self, board: List[List[str]]) -> None:
                 rows[i].add(c)
                 cols[j].add(c)
                 sub[(i // 3) * 3 + j // 3].add(c)
-    
-    # print(emptyCells)
 
     # dfs backtrack fill emptycells one by one
     def dfs(idx) -> bool:

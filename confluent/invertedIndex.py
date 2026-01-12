@@ -1,13 +1,40 @@
+
+
 """
-Word Search with AND / OR
+Follow-up Question: Phrase Search (Case-Insensitive)
 
-You are given a list of documents.
-Each document has an ID and a string of words.
+Now extend the previous boolean word search engine to support phrase searching.
 
-Part 1
-Design a data structure that, given a word, returns all document IDs that contain this word.
+You are given a list of documents. Each document has:
 
-Part 2
+a unique docId
+
+a text string
+
+Implement a class DocumentLibrary that supports:
+
+1) Constructor
+DocumentLibrary(documents)
+documents is a list like: [(docId, text), ...]
+Preprocess the documents so that phrase search can be answered efficiently.
+The system should scale to up to 1,000,000 documents.
+
+2) Search API
+search(phrase) -> list[docId]
+Return all document IDs whose text contains the exact phrase, case-insensitive.
+
+A phrase matches only if its words appear in order and consecutively in the document.
+
+You do not need fuzzy matching.
+
+Words are separated by spaces, and the text may also contain punctuation symbols:
+. , ? !
+
+Searching must work even when the phrase spans many words.
+"""
+
+"""
+follow-up
 Support boolean queries using AND and OR, such as:
 word1 AND word2
 word1 AND (word2 OR word3)
@@ -23,116 +50,249 @@ Traverse the tree to evaluate the query
 AND = intersection of document ID sets
 OR = union of document ID sets
 Return the final list of matching document IDs.
-
-example:
-documents = [
-    (1, 'apple banana'),
-    (2, 'banana orange'),
-    (3, 'apple orange')
-]
-
-index = buildIndex(documents)
-engine = Query(index)
-
-queryPhrase = Node(
-    'AND',
-    Node('apple'),
-    Node('OR', Node('banana'), Node('orange'))
-)
-
-engine.search()
 """
+
 from collections import defaultdict
 
-def buildIndex(document):
-    ans = defaultdict(set)
-    for docId, doc in document:
-        for w in doc.split(' '):
-            ans[w].add(docId)
+def tokenize(text) -> list[str]:
+    tokens = []
+    cur = []
+    for ch in text:
+        # if 'a' <= ch <= 'z' or 'A' <= ch <= 'Z' or '0' <= ch <= '9'
+        if ch.isalnum():
+            cur.append(ch)
+        else:
+            if cur:
+                tokens.append(''.join(cur))
+                cur = []
+            if ch in ',.?!':
+                # single char as token
+                tokens.append(ch)
+    # append last word
+    if cur:
+        tokens.append(''.join(cur))
     
-    return ans
+    return tokens
+
+class DocumentLibrary:
+    def __init__(self, documents):
+        # positional inverted index
+        # index[token][docId] = positions list(increasing)
+        self.index = defaultdict(lambda: defaultdict(list))
+
+        # boolean index: wordToDocIds[token] = {docIds...}
+        self.wordToDocIds = defaultdict(set)
+
+        for docId, text in documents:
+            tokens = tokenize(text.lower())
+            for pos, tok in enumerate(tokens):
+                self.index[tok][docId].append(pos)
+                self.wordToDocIds[tok].add(docId)
+    
+    def docsForWord(self, word):
+        toks = tokenize(word)
+        if len(toks) != 1: # only return for single word
+            return set()
+        return self.wordToDocIds[toks[0]]
 
 
-class Node:
-    # if Node is leaf, the val is word, else val is opration type
-    def __init__(self, val, left = None, right = None):
-        self.val = val
+    
+    def search(self, phrase: str):
+        # return list of docIds containing the phrase
+        # phrase must match as consecutive tokens.
+        phraseTokens = tokenize(phrase.lower())
+        if not phraseTokens:
+            return []
+        
+        # each item in postingsList is dict list [{ docId: postions[] }]
+        postingsList = []
+        for tok in phraseTokens:
+            posting = self.index.get(tok)
+            if not posting:
+                return []
+            postingsList.append(posting)
+        
+        # candidate docs must contain all tokens
+        candidateDocs = set(postingsList[0].keys())
+        for posting in postingsList[1:]:
+            candidateDocs &= set(posting.keys())
+            if not candidateDocs:
+                return []
+            
+        res = []
+        for docId in candidateDocs:
+            if self._hasPhraseInDoc(docId, postingsList):
+                res.append(docId)
+        res.sort()
+        return res
+    def _hasPhraseInDoc(self, docId, postingsList):
+        """
+        postingsList[i][docId] = positions list for ith token in the phrase
+        return True if phrase tokens appear consecutively in this doc
+        """
+        startCandidates = None
+        for i, posting in enumerate(postingsList):
+            posList = posting[docId] # list[int]
+            starts = { p - i for p in posList } # if ith token appears at position p, the whole phrase to start at s
+
+            # init at i == 0
+            if startCandidates is None: 
+                startCandidates = starts 
+            else: # select out still valid start index
+                startCandidates &= starts
+            
+            if not startCandidates:
+                return False 
+        
+        return True
+
+
+class OpType:
+    WORD = 'WORD'
+    AND = 'AND'
+    OR = 'OR'
+
+class QueryNode:
+    def __init__(self, opType, word=None, left=None, right=None):
+        self.opType = opType
+        self.word = word
         self.left = left
         self.right = right
 
-class Query:
-    def __init__(self, index: dict[set]):
-        self.index = index
+def evalBooleanQuery(docLib: DocumentLibrary, root: QueryNode):
+    def dfs(node):
+        if node.opType == OpType.WORD:
+            return docLib.docsForWord(node.word)
+
+        leftSet = dfs(node.left)
+        rightSet = dfs(node.right)
+
+        if node.opType == OpType.AND:
+            return leftSet & rightSet
+        else:
+            return leftSet | rightSet
     
-    def search(self, root: Node):
-        return self._eval(root)
-    def _eval(self, node: Node):
-        # the node is leaf, return val directly
-        if node.left == None and node.right == None:
-            return self.index[node.val]
-        
-        left = self._eval(node.left)
-        right = self._eval(node.right)
-        
-        if node.val == 'AND':
-            return left & right 
+    res = list(dfs(root))
+    res.sort()
+    return res
 
-        if node.val == 'OR':
-            return left | right
 
-# time O(total words) O(total postings)
-# def buildIndex(documents):
-#     index = defaultdict(set)
-#     for docId, text in documents:
-#         for word in text.split():
-#             index[word].add(docId)
-#     return index 
+# --------- Tests for DocumentLibrary (phrase search) ---------
 
-# part 2 
-# class Node:
-#     def __init__(self, val, left = None, right = None):
-#         self.val = val
-#         self.left = left 
-#         self.right = right 
+# 1) basic word + phrase
+docs = [
+    ("1", "Cloud computing is great."),
+    ("2", "cloud monitoring dashboards help."),
+    ("3", "In the cloud computing is common."),
+]
+lib = DocumentLibrary(docs)
+assert lib.search("cloud") == ["1", "2", "3"]
+assert lib.search("cloud monitoring") == ["2"]
+assert lib.search("Cloud computing is") == ["1", "3"]
+assert lib.search("serverless computing") == []
 
-# class Query:
-#     def __init__(self, index):
-#         self.index = index
-#     # time O(N * k) N is number of query nodes, k is size of a posting list; Space O(revursion depth)
-#     def search(self, root: Node):
-#         return self._eval(root)
+# 2) order matters + must be consecutive
+docs = [
+    ("1", "cloud computing is fun"),
+    ("2", "cloud is computing fun"),
+]
+lib = DocumentLibrary(docs)
+assert lib.search("cloud computing") == ["1"]
+assert lib.search("computing cloud") == []
+assert lib.search("cloud computing is") == ["1"]
+assert lib.search("cloud is") == ["2"]
 
-#     def _eval(self, node):
-#         if node.left is None and node.right is None:
-#             return self.index.get(node.val, set())
-        
-#         left = self._eval(node.left)
-#         right = self._eval(node.right)
+# 3) repeated words (multiple matches in one doc)
+docs = [
+    ("1", "a b a b a b"),
+    ("2", "a a b b"),
+]
+lib = DocumentLibrary(docs)
+assert lib.search("a b") == ["1", "2"]
+assert lib.search("b a") == ["1"]
+assert lib.search("a b a") == ["1"]
+assert lib.search("b a b") == ["1"]
 
-#         if node.val == 'AND':
-#             return left & right
-#         if node.val == 'OR':
-#             return left | right 
+# 4) punctuation tokens matter: . , ? !
+docs = [
+    ("1", "hello, world!"),
+    ("2", "hello world"),
+    ("3", "hello,world!"),     # no space but tokenizer still splits
+    ("4", "hello , world !"),  # spaces around punctuation
+]
+lib = DocumentLibrary(docs)
+assert lib.search("hello, world") == ["1", "3", "4"]
+assert lib.search("hello world") == ["2"]
+assert lib.search("world!") == ["1", "3", "4"]
+assert lib.search("world !") == ["1", "3", "4"]
+assert lib.search("hello?") == []
 
+# 5) phrase at start / middle / end
+docs = [
+    ("1", "start middle end"),
+    ("2", "xxx start middle end yyy"),
+    ("3", "start middle"),
+    ("4", "middle end"),
+]
+lib = DocumentLibrary(docs)
+assert lib.search("start middle") == ["1", "2", "3"]
+assert lib.search("middle end") == ["1", "2", "4"]
+assert lib.search("start middle end") == ["1", "2"]
+assert lib.search("end") == ["1", "2", "4"]
+
+# 6) empty phrase -> []
+docs = [("1", "abc def")]
+lib = DocumentLibrary(docs)
+assert lib.search("") == []
+
+# 7) numeric tokens
+docs = [
+    ("1", "error 500 happened"),
+    ("2", "error 404 happened"),
+]
+lib = DocumentLibrary(docs)
+assert lib.search("error 500") == ["1"]
+assert lib.search("500 happened") == ["1"]
+assert lib.search("error 4") == []
+assert lib.search("error 404 happened") == ["2"]
+
+# 8) case-insensitive
+docs = [
+    ("1", "HeLLo WoRLd"),
+    ("2", "hello world"),
+]
+lib = DocumentLibrary(docs)
+assert lib.search("HELLO") == ["1", "2"]
+assert lib.search("hello world") == ["1", "2"]
+assert lib.search("WORLD") == ["1", "2"]
 
 documents = [
-    (1, 'apple banana'),
-    (2, 'banana orange'),
-    (3, 'apple orange')
+    (1, "apple banana"),
+    (2, "banana orange"),
+    (3, "apple orange"),
 ]
+lib = DocumentLibrary(documents)
 
-index = buildIndex(documents)
-
-engine = Query(index)
-
-root = Node(
-    'AND',
-    Node('apple'),
-    Node('OR', Node('banana'), Node('orange'))
+# apple AND (banana OR orange) => {1,3}
+root = QueryNode(
+    OpType.AND,
+    left=QueryNode(OpType.WORD, word="apple"),
+    right=QueryNode(
+        OpType.OR,
+        left=QueryNode(OpType.WORD, word="banana"),
+        right=QueryNode(OpType.WORD, word="orange"),
+    ),
 )
+assert evalBooleanQuery(lib, root) == [1, 3]
 
-print('apple docIds ', index['apple'])
-print('banada docIds ', index['banana'])
-print('orange docIds ', index['orange'])
+# banana AND orange => {2}
+root2 = QueryNode(
+    OpType.AND,
+    left=QueryNode(OpType.WORD, word="banana"),
+    right=QueryNode(OpType.WORD, word="orange"),
+)
+assert evalBooleanQuery(lib, root2) == [2]
 
-print(engine.search(root))
+# missing word => empty
+root3 = QueryNode(OpType.WORD, word="grape")
+assert evalBooleanQuery(lib, root3) == []
