@@ -16,19 +16,69 @@ Orders may be partially filled if the available quantity is less than the order'
 Return the total number of shares successfully traded.
 
 Example 1:
-
 Input: orders = [["150", "5", "buy"],["190", "1", "sell"],["200", "1", "sell"],["100", "9", "buy"],["140", "8", "sell"],["210", "4", "buy"]]
 Output: 9
 Explanation: There's no trade in the first four orders. Trading begins with the fifth order, a sell at 140 for 8 shares, which matches a stored buy order at 150, executing 5 shares. The sixth order, a buy at 210 for 4 shares, then triggers trading by matching the remaining 3 shares from the sell at 140 and 1 share from the sell at 190. In total, 5 + 4 = 9 shares are traded.
 
 Example 2:
-
 Input: orders = [["100","10","buy"],["105","5","buy"],["110","8","buy"]]
 Output: 0
 
 Example 3:
-
 Input: orders = [["120","10","buy"],["115","5","sell"],["110","3","sell"]]
 Output: 8
 
 """
+import heapq
+def findMaxTradeShares(orders):
+    # maintain two books:
+    # maxheap for buy order
+    # minheap for sell order
+
+    # matching rules
+    # incoming buy matches lowest sell while sellPrice <= buyPrice
+    # incoming sell matches highest buy while buyPrice >= sellPrice
+
+    bq = [] # buy heap
+    sq = [] # sell heap
+    res = 0
+    
+    # time O(nlgn) n is length of order
+    # space O(n)
+    for price, cnt, type in orders:
+        price = int(price)
+        cnt = int(cnt)
+
+        if type == 'buy':
+            while cnt > 0 and sq and sq[0][0] <= price: # have sell order match
+                sellPrice, sellCnt = heapq.heappop(sq)
+                m = min(cnt, sellCnt)
+                res += m
+                cnt -= m
+                sellCnt -= m
+                if sellCnt > 0:
+                    heapq.heappush(sq, (sellPrice, sellCnt))
+            
+            if cnt > 0:
+                heapq.heappush(bq, (-price, cnt))
+        
+        else: # sell
+            while cnt > 0 and bq and -bq[0][0] >= price:
+                buyPriceNeg, buyCnt = heapq.heappop(bq)
+                m = min(cnt, buyCnt)
+                res += m
+                cnt -= m
+                buyCnt -= m
+                if buyCnt > 0:
+                    heapq.heappush(bq, (buyPriceNeg, buyCnt))
+            
+            if cnt > 0:
+                heapq.heappush(sq, (price, cnt))
+        
+    return res
+
+
+assert findMaxTradeShares([["150","5","buy"],["190","1","sell"],["200","1","sell"],["100","9","buy"],["140","8","sell"],["210","4","buy"]]) == 9
+assert findMaxTradeShares([["100","10","buy"],["105","5","buy"],["110","8","buy"]]) == 0
+assert findMaxTradeShares([["120","10","buy"],["115","5","sell"],["110","3","sell"]]) == 8
+
