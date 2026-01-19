@@ -26,7 +26,6 @@ class MeetingScheduler:
             if idx < len(meetings) and meetings[idx][0] < end:
                 continue
                 
-
             meetings.insert(idx, (start, end))
             return roomId
         return ''

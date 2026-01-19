@@ -32,7 +32,6 @@ def findMatchingRobots(board, distance):
             else:
                 leftDist[r][c] = c - lastBlocker
 
-        
         nextBlocker = n 
         for c in range(n - 1, -1, -1):
             if board[r][c] == 'X':
