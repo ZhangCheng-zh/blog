@@ -42,7 +42,7 @@ class UnboundMatrix:
         self.colDict[y].append(x)
 
     def isConnected(self, point1, point2):
-        
+        pass
 
     def getMinSteps(self, start, end):
         pass
