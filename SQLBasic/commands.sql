@@ -95,3 +95,39 @@ from posts
 where createdAt < :lastCreatedAt
 order by createdAt DESC
 limit 20;
+
+-- create partitions by month
+create table posts (
+    id serial,
+    user_id int,
+    content text,
+    created_at timestamp
+) partition by range(created_at);
+
+create table posts_2024_1 partition of posts 
+for values from ('2024-01-01') to ('2024-02-01')
+
+
+"""
+Wnen a write occurs in PostgreSQL, several steps happen to ensure both performance
+and durability
+1 Transaction Log(WAL) Write[DISK]
+2 Buffer Cache Update[memory]
+3 Background Write[Memory -> Disk]
+4 Index Updates [Memory & Disk]
+
+What affects throughput limits? several factors:
+1 Hardwar: write throughput is often bottlenecked by disk I/O for the WAL
+2 Indexes: each additional index reduces write throughput
+3 Replication: If configured, synchronous replication add latency as we wait for replicas to comfirm
+4 Transaction complexity: more tables or indexes touched = slower transactions
+
+Write performance optimization
+1 Vertical scaling: Using faster NVM disks for better WAL performance, adding more RAM to increase the buffer cache size,
+or upgrading to CPUs with more cores tp handle parallel operations more effectively
+2 Batch processing: instead of processing each write individually, collect multiple operations and execute them in a single
+transaction.
+3 Write offloading: using message queue to decouple producer and consumer
+4 Table partitioning: 
+5 Sharding
+"""
